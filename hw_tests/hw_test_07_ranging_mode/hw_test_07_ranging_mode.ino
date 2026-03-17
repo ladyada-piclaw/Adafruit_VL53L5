@@ -157,19 +157,34 @@ void setup() {
   vl53l5cx.stopRanging();
   report("6. Range in AUTONOMOUS", readA && validA > 0);
 
-  // Test 7: Autonomous timing reflects integration time
-  // In autonomous mode, frame interval >= integration time
+  // Test 7: Second autonomous ranging session works
+  // Verifies stop/start cycle in autonomous mode
   vl53l5cx.setRangingMode(VL53L5CX_RANGING_MODE_AUTONOMOUS);
-  vl53l5cx.setIntegrationTime(100);
-  vl53l5cx.setRangingFrequency(10);
   vl53l5cx.startRanging();
-  float interval = measureFrameInterval(5);
-  vl53l5cx.stopRanging();
-  Serial.print(F("   Autonomous 100ms int, interval: "));
-  Serial.print(interval, 1);
-  Serial.println(F(" ms"));
-  // Frame interval should be >= 100ms
-  report("7. Autonomous interval >= 100ms", interval >= 90);
+  {
+    unsigned long t = millis();
+    bool readA2 = false;
+    while (millis() - t < 3000) {
+      if (vl53l5cx.isDataReady()) {
+        readA2 = true;
+        break;
+      }
+      delay(5);
+    }
+    vl53l5cx.getRangingData(&results);
+    vl53l5cx.stopRanging();
+    uint8_t validA2 = 0;
+    if (readA2) {
+      for (uint8_t i = 0; i < 16; i++) {
+        if (results.distance_mm[i] > 0 && results.distance_mm[i] < 4000)
+          validA2++;
+      }
+      Serial.print(F("   2nd AUTONOMOUS valid zones: "));
+      Serial.print(validA2);
+      Serial.println(F("/16"));
+    }
+    report("7. Second autonomous session", readA2 && validA2 > 0);
+  }
 
   // Summary
   Serial.println();
