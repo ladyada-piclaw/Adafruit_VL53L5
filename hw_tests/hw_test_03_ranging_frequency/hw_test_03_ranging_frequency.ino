@@ -16,6 +16,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+#include "../hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
 
@@ -64,16 +65,15 @@ float measureFrameInterval(uint8_t numFrames) {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  delay(2000);
 
   Serial.println(F("=== HW Test 03: Ranging Frequency ==="));
   Serial.println();
 
-  Wire.begin();
-  Wire.setClock(1000000);
+  HW_TEST_I2C_INIT();
 
   Serial.println(F("   Initializing sensor..."));
-  if (!vl53l5cx.begin()) {
+  if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE)) {
     Serial.println(F("Init failed!"));
     while (1) delay(10);
   }

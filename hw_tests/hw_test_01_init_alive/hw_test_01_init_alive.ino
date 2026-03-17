@@ -19,6 +19,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+#include "../hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
 
@@ -44,10 +45,9 @@ void setup() {
   Serial.println();
 
   // Test 1: I2C scan
-  Wire1.begin(SDA1, SCL1);  // STEMMA QT on ESP32 QT Py
-  Wire1.setClock(400000);
-  Wire1.beginTransmission(0x29);
-  bool i2cFound = (Wire1.endTransmission() == 0);
+  HW_TEST_I2C_INIT();
+  HW_TEST_WIRE.beginTransmission(0x29);
+  bool i2cFound = (HW_TEST_WIRE.endTransmission() == 0);
   report("1. I2C device at 0x29", i2cFound);
   if (!i2cFound) {
     Serial.println(F("Sensor not found, cannot continue."));
@@ -56,7 +56,7 @@ void setup() {
 
   // Test 2: begin()
   Serial.println(F("   Initializing sensor (up to 10s)..."));
-  bool initOk = vl53l5cx.begin(0x29, &Wire1);
+  bool initOk = vl53l5cx.begin(0x29, &HW_TEST_WIRE);
   report("2. begin() succeeds", initOk);
   if (!initOk) {
     Serial.println(F("Init failed, cannot continue."));
