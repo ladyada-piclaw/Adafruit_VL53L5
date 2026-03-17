@@ -686,35 +686,46 @@ bool Adafruit_VL53L5_Lite::stopRanging() {
     return false;
   }
 
+  // Mirrors vl53l5cx_stop_ranging exactly
   uint8_t tmp = 0;
   uint16_t timeout = 0;
+  uint32_t auto_stop_flag = 0;
 
-  // Issue stop command
-  _readMulti(0x0000, _temp, 4);
-  uint8_t auto_flag = _temp[3];
+  _readMulti(0x2FFC, (uint8_t *)&auto_stop_flag, 4);
 
-  if (auto_flag & 0x80) {
-    // Autonomous mode — just send stop
-    uint8_t cmd[] = {0x00, 0x02, 0x00, 0x00};
-    _writeMulti(VL53L5_UI_CMD_END - 3, cmd, 4);
-    _pollForAnswer(4, 1, VL53L5_UI_CMD_STATUS, 0xFF, 0x03);
-  } else {
-    // Continuous mode — wait for data ready, then stop
-    do {
-      _readMulti(0x0000, _temp, 4);
-      if ((_temp[0] != _streamcount) && (_temp[0] != 255) &&
-          (_temp[1] == 0x05) && ((_temp[2] & 0x05) == 0x05) &&
-          ((_temp[3] & 0x10) == 0x10)) {
+  if (auto_stop_flag != 0x4FF) {
+    _setPage(0x00);
+
+    // Provoke MCU stop
+    _writeByte(0x15, 0x16);
+    _writeByte(0x14, 0x01);
+
+    // Poll for GO2 status bit 7 set (MCU stopped)
+    while (((tmp & 0x80) >> 7) == 0x00) {
+      _readByte(0x06, &tmp);
+      delay(10);
+      timeout++;
+      if (timeout > 500) {
         break;
       }
-      delay(1);
-      timeout++;
-    } while (timeout < 1000);
-
-    uint8_t cmd[] = {0x00, 0x02, 0x00, 0x00};
-    _writeMulti(VL53L5_UI_CMD_END - 3, cmd, 4);
-    _pollForAnswer(4, 1, VL53L5_UI_CMD_STATUS, 0xFF, 0x03);
+    }
   }
+
+  // Check GO2 status 1
+  _readByte(0x06, &tmp);
+  if ((tmp & 0x80) != 0) {
+    _readByte(0x07, &tmp);
+    // Status 0x84 and 0x85 are OK
+  }
+
+  // Undo MCU stop
+  _setPage(0x00);
+  _writeByte(0x14, 0x00);
+  _writeByte(0x15, 0x00);
+
+  // Stop xshut bypass
+  _writeByte(0x09, 0x04);
+  _setPage(0x02);
 
   return true;
 }
