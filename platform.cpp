@@ -13,9 +13,6 @@
 #include "platform.h"
 #include <Arduino.h>
 
-// Maximum I2C transaction size (allowing 2 bytes for register address)
-#define I2C_MAX_TRANSFER 128
-
 uint8_t RdByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
                uint8_t *p_value) {
   uint8_t reg[2];
@@ -46,11 +43,13 @@ uint8_t RdMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
   uint8_t reg[2];
   uint32_t bytesRemaining = size;
   uint32_t offset = 0;
+  // Query BusIO for the actual I2C buffer size
+  uint32_t maxRead = p_platform->i2c_dev->maxBufferSize();
 
   while (bytesRemaining > 0) {
     uint32_t toRead = bytesRemaining;
-    if (toRead > I2C_MAX_TRANSFER) {
-      toRead = I2C_MAX_TRANSFER;
+    if (toRead > maxRead) {
+      toRead = maxRead;
     }
 
     reg[0] = ((RegisterAddress + offset) >> 8) & 0xFF;
@@ -71,12 +70,14 @@ uint8_t WrMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
                 uint8_t *p_values, uint32_t size) {
   uint32_t bytesRemaining = size;
   uint32_t offset = 0;
-  uint8_t buffer[I2C_MAX_TRANSFER + 2]; // 2 bytes for register address
+  // Reserve 2 bytes for register address
+  uint32_t maxPayload = p_platform->i2c_dev->maxBufferSize() - 2;
+  uint8_t buffer[maxPayload + 2];
 
   while (bytesRemaining > 0) {
     uint32_t toWrite = bytesRemaining;
-    if (toWrite > I2C_MAX_TRANSFER) {
-      toWrite = I2C_MAX_TRANSFER;
+    if (toWrite > maxPayload) {
+      toWrite = maxPayload;
     }
 
     buffer[0] = ((RegisterAddress + offset) >> 8) & 0xFF;
