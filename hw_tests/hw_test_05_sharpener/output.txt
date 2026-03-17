@@ -1,0 +1,22 @@
+=== HW Test 05: Sharpener ===
+
+   Initializing sensor...
+   Set 0%, readback: 0%
+1. Set/get 0% (off) ... PASSED
+   Set 5%, readback: 4%
+2. Set/get 5% (+/-1) ... PASSED
+   Set 14%, readback: 13%
+3. Set/get 14% (+/-1) ... PASSED
+   Set 50%, readback: 49%
+4. Set/get 50% (+/-1) ... PASSED
+   Set 99%, readback: 98%
+5. Set/get 99% (+/-1) ... PASSED
+   StdDev at 0%: 1019.7 mm
+6. Range with sharpener 0% ... PASSED
+   StdDev at 50%: 916.6 mm
+   Ratio (0%/50%): 1.11
+7. Range with sharpener 50% ... PASSED
+
+=== SUMMARY ===
+7 passed, 0 failed
+Result: ALL PASSED

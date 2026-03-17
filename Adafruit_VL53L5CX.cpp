@@ -229,6 +229,93 @@ uint8_t Adafruit_VL53L5CX::getSharpenerPercent(void) {
 }
 
 /*!
+ * @brief Set target order (closest or strongest first)
+ * @param order VL53L5CX_TARGET_ORDER_CLOSEST (1) or
+ *              VL53L5CX_TARGET_ORDER_STRONGEST (2)
+ * @return true on success
+ */
+bool Adafruit_VL53L5CX::setTargetOrder(uint8_t order) {
+  if (!_initialized) {
+    return false;
+  }
+  return (vl53l5cx_set_target_order(&_config, order) == VL53L5CX_STATUS_OK);
+}
+
+/*!
+ * @brief Get current target order
+ * @return VL53L5CX_TARGET_ORDER_CLOSEST (1) or
+ *         VL53L5CX_TARGET_ORDER_STRONGEST (2), or 0 on error
+ */
+uint8_t Adafruit_VL53L5CX::getTargetOrder(void) {
+  if (!_initialized) {
+    return 0;
+  }
+  uint8_t order = 0;
+  if (vl53l5cx_get_target_order(&_config, &order) != VL53L5CX_STATUS_OK) {
+    return 0;
+  }
+  return order;
+}
+
+/*!
+ * @brief Set ranging mode (continuous or autonomous)
+ * @param mode VL53L5CX_RANGING_MODE_CONTINUOUS (1) or
+ *             VL53L5CX_RANGING_MODE_AUTONOMOUS (3)
+ * @return true on success
+ */
+bool Adafruit_VL53L5CX::setRangingMode(uint8_t mode) {
+  if (!_initialized) {
+    return false;
+  }
+  return (vl53l5cx_set_ranging_mode(&_config, mode) == VL53L5CX_STATUS_OK);
+}
+
+/*!
+ * @brief Get current ranging mode
+ * @return VL53L5CX_RANGING_MODE_CONTINUOUS (1) or
+ *         VL53L5CX_RANGING_MODE_AUTONOMOUS (3), or 0 on error
+ */
+uint8_t Adafruit_VL53L5CX::getRangingMode(void) {
+  if (!_initialized) {
+    return 0;
+  }
+  uint8_t mode = 0;
+  if (vl53l5cx_get_ranging_mode(&_config, &mode) != VL53L5CX_STATUS_OK) {
+    return 0;
+  }
+  return mode;
+}
+
+/*!
+ * @brief Set power mode (sleep or wakeup)
+ * @param mode VL53L5CX_POWER_MODE_SLEEP (0) or
+ *             VL53L5CX_POWER_MODE_WAKEUP (1)
+ * @return true on success
+ */
+bool Adafruit_VL53L5CX::setPowerMode(uint8_t mode) {
+  if (!_initialized) {
+    return false;
+  }
+  return (vl53l5cx_set_power_mode(&_config, mode) == VL53L5CX_STATUS_OK);
+}
+
+/*!
+ * @brief Get current power mode
+ * @return VL53L5CX_POWER_MODE_SLEEP (0) or
+ *         VL53L5CX_POWER_MODE_WAKEUP (1), or 0xFF on error
+ */
+uint8_t Adafruit_VL53L5CX::getPowerMode(void) {
+  if (!_initialized) {
+    return 0xFF;
+  }
+  uint8_t mode = 0;
+  if (vl53l5cx_get_power_mode(&_config, &mode) != VL53L5CX_STATUS_OK) {
+    return 0xFF;
+  }
+  return mode;
+}
+
+/*!
  * @brief Change the I2C address of the sensor
  * @param new_address New 7-bit I2C address
  * @return true on success

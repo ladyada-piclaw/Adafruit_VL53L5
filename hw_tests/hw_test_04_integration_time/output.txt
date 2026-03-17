@@ -1,0 +1,22 @@
+=== HW Test 04: Integration Time ===
+
+   Initializing sensor...
+   Set 2ms, readback: 2 ms
+1. Set/get 2ms ... PASSED
+   Set 10ms, readback: 10 ms
+2. Set/get 10ms ... PASSED
+   Set 50ms, readback: 50 ms
+3. Set/get 50ms ... PASSED
+   Set 100ms, readback: 100 ms
+4. Set/get 100ms ... PASSED
+   Set 500ms, readback: 500 ms
+5. Set/get 500ms ... PASSED
+   Avg sigma at 10ms: 4.2 mm
+6. Sigma at 10ms readable ... PASSED
+   Avg sigma at 100ms: 1.5 mm
+   Sigma ratio (10ms/100ms): 2.70
+7. 100ms sigma <= 10ms sigma ... PASSED
+
+=== SUMMARY ===
+7 passed, 0 failed
+Result: ALL PASSED

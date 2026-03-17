@@ -52,6 +52,15 @@ public:
   bool setSharpenerPercent(uint8_t percent);
   uint8_t getSharpenerPercent(void);
 
+  bool setTargetOrder(uint8_t order);
+  uint8_t getTargetOrder(void);
+
+  bool setRangingMode(uint8_t mode);
+  uint8_t getRangingMode(void);
+
+  bool setPowerMode(uint8_t mode);
+  uint8_t getPowerMode(void);
+
   bool setAddress(uint8_t new_address);
 
   VL53L5CX_Configuration *getConfig(void) { return &_config; }
