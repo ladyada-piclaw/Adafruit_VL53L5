@@ -20,7 +20,11 @@
 #include <Adafruit_VL53L5CX.h>
 #include "hw_test_helper.h"
 
+#ifdef ESP32
+#define LPN_PIN 32
+#else
 #define LPN_PIN A1
+#endif
 
 Adafruit_VL53L5CX vl53l5cx;
 
