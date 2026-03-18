@@ -249,17 +249,22 @@ function renderFrame() {
     initializeGrid(res);
   }
 
-  // Update each cell
+  // Update each cell (mirror X to match physical sensor orientation)
   const size = expectedSize;
   for (let i = 0; i < res; i++) {
+    // Mirror X axis: within each row, reverse the column order
+    const row = Math.floor(i / size);
+    const col = i % size;
+    const mirroredIdx = row * size + (size - 1 - col);
+
     const cell = document.getElementById(`cell-${i}`);
     if (!cell) continue;
 
-    const dist = distances[i];
-    const stat = status[i];
+    const dist = distances[mirroredIdx];
+    const stat = status[mirroredIdx];
 
-    // Status 5 = valid measurement, other values indicate errors
-    const isValid = stat === 5 && dist > 0 && dist < 4000;
+    // Status 5 = valid, 9 = valid but high sigma
+    const isValid = (stat === 5 || stat === 9) && dist > 0 && dist < 4000;
 
     if (isValid) {
       cell.textContent = dist;
