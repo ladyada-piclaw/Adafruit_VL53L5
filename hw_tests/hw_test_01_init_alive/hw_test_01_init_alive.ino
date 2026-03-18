@@ -39,7 +39,7 @@ void report(const char *name, bool ok) {
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);  // Give time to connect serial monitor (ESP32 doesn't need while(!Serial))
+  while (!Serial) delay(10);
 
   Serial.println(F("=== HW Test 01: Init & Alive ==="));
   Serial.println();

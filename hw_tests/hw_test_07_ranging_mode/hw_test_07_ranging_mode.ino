@@ -73,7 +73,7 @@ float measureFrameInterval(uint8_t numFrames) {
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);
+  while (!Serial) delay(10);
 
   Serial.println(F("=== HW Test 07: Ranging Mode ==="));
   Serial.println();

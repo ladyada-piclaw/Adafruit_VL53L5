@@ -26,7 +26,7 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);
+  while (!Serial) delay(10);
 
   Serial.println(F("=== HW Test 12: Motion Indicator ==="));
   Serial.println();

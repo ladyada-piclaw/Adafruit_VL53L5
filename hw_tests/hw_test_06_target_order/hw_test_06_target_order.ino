@@ -46,7 +46,7 @@ bool waitAndRead(VL53L5CX_ResultsData *results) {
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);
+  while (!Serial) delay(10);
 
   Serial.println(F("=== HW Test 06: Target Order ==="));
   Serial.println();

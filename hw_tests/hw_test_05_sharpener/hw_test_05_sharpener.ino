@@ -72,7 +72,7 @@ float distanceStdDev(VL53L5CX_ResultsData *results, uint8_t zones) {
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);
+  while (!Serial) delay(10);
 
   Serial.println(F("=== HW Test 05: Sharpener ==="));
   Serial.println();

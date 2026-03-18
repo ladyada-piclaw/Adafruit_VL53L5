@@ -55,7 +55,7 @@ bool waitForPin(uint8_t state, unsigned long timeoutMs) {
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);
+  while (!Serial) delay(10);
 
   Serial.println(F("=== HW Test 09: INT Pin ==="));
   Serial.println();

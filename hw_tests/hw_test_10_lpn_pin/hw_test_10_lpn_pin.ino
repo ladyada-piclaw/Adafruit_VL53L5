@@ -49,7 +49,7 @@ bool i2cPresent(uint8_t addr) {
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);
+  while (!Serial) delay(10);
 
   Serial.println(F("=== HW Test 10: LPn Pin ==="));
   Serial.println();
