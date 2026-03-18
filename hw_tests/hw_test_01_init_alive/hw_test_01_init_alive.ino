@@ -46,7 +46,7 @@ void setup() {
 
   // Test 1: I2C scan
   Wire.begin();
-  Wire.setClock(400000);
+  Wire.setClock(1000000);
   Wire.beginTransmission(0x29);
   bool i2cFound = (Wire.endTransmission() == 0);
   report("1. I2C device at 0x29", i2cFound);

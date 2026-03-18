@@ -17,10 +17,10 @@
     defined(ARDUINO_ADAFRUIT_QTPY_ESP32S3_NOPSRAM) || \
     defined(ARDUINO_ADAFRUIT_QTPY_ESP32S3)
   #define HW_TEST_WIRE Wire1
-  #define HW_TEST_I2C_INIT() do { Wire1.begin(SDA1, SCL1); Wire1.setClock(400000); } while(0)
+  #define HW_TEST_I2C_INIT() do { Wire1.begin(SDA1, SCL1); Wire1.setClock(1000000); } while(0)
 #else
   #define HW_TEST_WIRE Wire
-  #define HW_TEST_I2C_INIT() do { Wire.begin(); Wire.setClock(400000); } while(0)
+  #define HW_TEST_I2C_INIT() do { Wire.begin(); Wire.setClock(1000000); } while(0)
 #endif
 
 #endif // HW_TEST_HELPER_H

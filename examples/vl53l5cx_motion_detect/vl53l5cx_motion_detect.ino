@@ -15,6 +15,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+#include <Wire.h>
 
 Adafruit_VL53L5CX vl53l5cx;
 VL53L5CX_ResultsData results;
@@ -23,6 +24,8 @@ void setup() {
   Serial.begin(115200);
   while (!Serial) delay(10);
 
+  Wire.begin();
+  Wire.setClock(1000000);
   Serial.println(F("Adafruit VL53L5CX Motion Detection Demo"));
   Serial.println(F("========================================"));
   Serial.println(F("Initializing sensor... (this can take up to 10 seconds)"));
