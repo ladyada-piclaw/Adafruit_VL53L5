@@ -23,45 +23,8 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-void report(const char *name, bool ok) {
-  Serial.print(name);
-  if (ok) {
-    Serial.println(F(" ... PASSED"));
-    passed++;
-  } else {
-    Serial.println(F(" ... FAILED"));
-    failed++;
-  }
-}
 
 // Measure average interval between frames over N frames
-float measureFrameInterval(uint8_t numFrames) {
-  // Flush stale data
-  VL53L5CX_ResultsData results;
-  while (vl53l5cx.isDataReady()) {
-    vl53l5cx.getRangingData(&results);
-  }
-
-  // Wait for first frame
-  unsigned long timeout = millis() + 5000;
-  while (!vl53l5cx.isDataReady()) {
-    if (millis() > timeout) return -1;
-    delay(1);
-  }
-  vl53l5cx.getRangingData(&results);
-
-  unsigned long start = millis();
-  for (uint8_t i = 0; i < numFrames; i++) {
-    timeout = millis() + 5000;
-    while (!vl53l5cx.isDataReady()) {
-      if (millis() > timeout) return -1;
-      delay(1);
-    }
-    vl53l5cx.getRangingData(&results);
-  }
-  unsigned long elapsed = millis() - start;
-  return (float)elapsed / numFrames;
-}
 
 void setup() {
   Serial.begin(115200);
@@ -156,4 +119,43 @@ void setup() {
 
 void loop() {
   delay(1000);
+}
+
+void report(const char *name, bool ok) {
+  Serial.print(name);
+  if (ok) {
+    Serial.println(F(" ... PASSED"));
+    passed++;
+  } else {
+    Serial.println(F(" ... FAILED"));
+    failed++;
+  }
+}
+
+float measureFrameInterval(uint8_t numFrames) {
+  // Flush stale data
+  VL53L5CX_ResultsData results;
+  while (vl53l5cx.isDataReady()) {
+    vl53l5cx.getRangingData(&results);
+  }
+
+  // Wait for first frame
+  unsigned long timeout = millis() + 5000;
+  while (!vl53l5cx.isDataReady()) {
+    if (millis() > timeout) return -1;
+    delay(1);
+  }
+  vl53l5cx.getRangingData(&results);
+
+  unsigned long start = millis();
+  for (uint8_t i = 0; i < numFrames; i++) {
+    timeout = millis() + 5000;
+    while (!vl53l5cx.isDataReady()) {
+      if (millis() > timeout) return -1;
+      delay(1);
+    }
+    vl53l5cx.getRangingData(&results);
+  }
+  unsigned long elapsed = millis() - start;
+  return (float)elapsed / numFrames;
 }

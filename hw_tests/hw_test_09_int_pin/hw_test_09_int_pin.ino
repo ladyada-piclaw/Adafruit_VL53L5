@@ -30,28 +30,8 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-void report(const char *name, bool ok) {
-  Serial.print(name);
-  if (ok) {
-    Serial.println(F(" ... PASSED"));
-    passed++;
-  } else {
-    Serial.println(F(" ... FAILED"));
-    failed++;
-  }
-}
 
 // Wait for INT pin to reach target state, with timeout
-bool waitForPin(uint8_t state, unsigned long timeoutMs) {
-  unsigned long start = millis();
-  while (millis() - start < timeoutMs) {
-    if (digitalRead(INT_PIN) == state) {
-      return true;
-    }
-    delay(1);
-  }
-  return false;
-}
 
 void setup() {
   Serial.begin(115200);
@@ -135,4 +115,26 @@ void setup() {
 
 void loop() {
   delay(1000);
+}
+
+void report(const char *name, bool ok) {
+  Serial.print(name);
+  if (ok) {
+    Serial.println(F(" ... PASSED"));
+    passed++;
+  } else {
+    Serial.println(F(" ... FAILED"));
+    failed++;
+  }
+}
+
+bool waitForPin(uint8_t state, unsigned long timeoutMs) {
+  unsigned long start = millis();
+  while (millis() - start < timeoutMs) {
+    if (digitalRead(INT_PIN) == state) {
+      return true;
+    }
+    delay(1);
+  }
+  return false;
 }

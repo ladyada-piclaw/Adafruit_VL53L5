@@ -23,54 +23,6 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-void report(const char *name, bool ok) {
-  Serial.print(name);
-  if (ok) {
-    Serial.println(F(" ... PASSED"));
-    passed++;
-  } else {
-    Serial.println(F(" ... FAILED"));
-    failed++;
-  }
-}
-
-bool waitAndRead(VL53L5CX_ResultsData *results) {
-  unsigned long start = millis();
-  while (millis() - start < 5000) {
-    if (vl53l5cx.isDataReady()) {
-      return vl53l5cx.getRangingData(results);
-    }
-    delay(1);
-  }
-  return false;
-}
-
-float measureFrameInterval(uint8_t numFrames) {
-  VL53L5CX_ResultsData results;
-  // Flush
-  while (vl53l5cx.isDataReady()) {
-    vl53l5cx.getRangingData(&results);
-  }
-  // Wait for first
-  unsigned long timeout = millis() + 5000;
-  while (!vl53l5cx.isDataReady()) {
-    if (millis() > timeout) return -1;
-    delay(1);
-  }
-  vl53l5cx.getRangingData(&results);
-
-  unsigned long start = millis();
-  for (uint8_t i = 0; i < numFrames; i++) {
-    timeout = millis() + 5000;
-    while (!vl53l5cx.isDataReady()) {
-      if (millis() > timeout) return -1;
-      delay(1);
-    }
-    vl53l5cx.getRangingData(&results);
-  }
-  return (float)(millis() - start) / numFrames;
-}
-
 void setup() {
   Serial.begin(115200);
   while (!Serial) delay(10);
@@ -199,4 +151,52 @@ void setup() {
 
 void loop() {
   delay(1000);
+}
+
+void report(const char *name, bool ok) {
+  Serial.print(name);
+  if (ok) {
+    Serial.println(F(" ... PASSED"));
+    passed++;
+  } else {
+    Serial.println(F(" ... FAILED"));
+    failed++;
+  }
+}
+
+bool waitAndRead(VL53L5CX_ResultsData *results) {
+  unsigned long start = millis();
+  while (millis() - start < 5000) {
+    if (vl53l5cx.isDataReady()) {
+      return vl53l5cx.getRangingData(results);
+    }
+    delay(1);
+  }
+  return false;
+}
+
+float measureFrameInterval(uint8_t numFrames) {
+  VL53L5CX_ResultsData results;
+  // Flush
+  while (vl53l5cx.isDataReady()) {
+    vl53l5cx.getRangingData(&results);
+  }
+  // Wait for first
+  unsigned long timeout = millis() + 5000;
+  while (!vl53l5cx.isDataReady()) {
+    if (millis() > timeout) return -1;
+    delay(1);
+  }
+  vl53l5cx.getRangingData(&results);
+
+  unsigned long start = millis();
+  for (uint8_t i = 0; i < numFrames; i++) {
+    timeout = millis() + 5000;
+    while (!vl53l5cx.isDataReady()) {
+      if (millis() > timeout) return -1;
+      delay(1);
+    }
+    vl53l5cx.getRangingData(&results);
+  }
+  return (float)(millis() - start) / numFrames;
 }

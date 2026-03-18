@@ -23,36 +23,9 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-void report(const char *name, bool ok) {
-  Serial.print(name);
-  if (ok) {
-    Serial.println(F(" ... PASSED"));
-    passed++;
-  } else {
-    Serial.println(F(" ... FAILED"));
-    failed++;
-  }
-}
 
-bool waitAndRead(VL53L5CX_ResultsData *results) {
-  unsigned long start = millis();
-  while (millis() - start < 5000) {
-    if (vl53l5cx.isDataReady()) {
-      return vl53l5cx.getRangingData(results);
-    }
-    delay(1);
-  }
-  return false;
-}
 
 // Average sigma across all zones (lower = less noise)
-float avgSigma(VL53L5CX_ResultsData *results, uint8_t zones) {
-  uint32_t sum = 0;
-  for (uint8_t i = 0; i < zones; i++) {
-    sum += results->range_sigma_mm[i];
-  }
-  return (float)sum / zones;
-}
 
 void setup() {
   Serial.begin(115200);
@@ -170,4 +143,34 @@ void setup() {
 
 void loop() {
   delay(1000);
+}
+
+void report(const char *name, bool ok) {
+  Serial.print(name);
+  if (ok) {
+    Serial.println(F(" ... PASSED"));
+    passed++;
+  } else {
+    Serial.println(F(" ... FAILED"));
+    failed++;
+  }
+}
+
+bool waitAndRead(VL53L5CX_ResultsData *results) {
+  unsigned long start = millis();
+  while (millis() - start < 5000) {
+    if (vl53l5cx.isDataReady()) {
+      return vl53l5cx.getRangingData(results);
+    }
+    delay(1);
+  }
+  return false;
+}
+
+float avgSigma(VL53L5CX_ResultsData *results, uint8_t zones) {
+  uint32_t sum = 0;
+  for (uint8_t i = 0; i < zones; i++) {
+    sum += results->range_sigma_mm[i];
+  }
+  return (float)sum / zones;
 }

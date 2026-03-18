@@ -23,52 +23,9 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-void report(const char *name, bool ok) {
-  Serial.print(name);
-  if (ok) {
-    Serial.println(F(" ... PASSED"));
-    passed++;
-  } else {
-    Serial.println(F(" ... FAILED"));
-    failed++;
-  }
-}
 
-bool waitAndRead(VL53L5CX_ResultsData *results) {
-  unsigned long start = millis();
-  while (millis() - start < 5000) {
-    if (vl53l5cx.isDataReady()) {
-      return vl53l5cx.getRangingData(results);
-    }
-    delay(1);
-  }
-  return false;
-}
 
 // Compute standard deviation of distance_mm across zones
-float distanceStdDev(VL53L5CX_ResultsData *results, uint8_t zones) {
-  // First pass: mean
-  float sum = 0;
-  uint8_t valid = 0;
-  for (uint8_t i = 0; i < zones; i++) {
-    if (results->distance_mm[i] > 0 && results->distance_mm[i] < 4000) {
-      sum += results->distance_mm[i];
-      valid++;
-    }
-  }
-  if (valid == 0) return -1;
-  float mean = sum / valid;
-
-  // Second pass: variance
-  float varSum = 0;
-  for (uint8_t i = 0; i < zones; i++) {
-    if (results->distance_mm[i] > 0 && results->distance_mm[i] < 4000) {
-      float diff = results->distance_mm[i] - mean;
-      varSum += diff * diff;
-    }
-  }
-  return sqrt(varSum / valid);
-}
 
 void setup() {
   Serial.begin(115200);
@@ -181,4 +138,50 @@ void setup() {
 
 void loop() {
   delay(1000);
+}
+
+void report(const char *name, bool ok) {
+  Serial.print(name);
+  if (ok) {
+    Serial.println(F(" ... PASSED"));
+    passed++;
+  } else {
+    Serial.println(F(" ... FAILED"));
+    failed++;
+  }
+}
+
+bool waitAndRead(VL53L5CX_ResultsData *results) {
+  unsigned long start = millis();
+  while (millis() - start < 5000) {
+    if (vl53l5cx.isDataReady()) {
+      return vl53l5cx.getRangingData(results);
+    }
+    delay(1);
+  }
+  return false;
+}
+
+float distanceStdDev(VL53L5CX_ResultsData *results, uint8_t zones) {
+  // First pass: mean
+  float sum = 0;
+  uint8_t valid = 0;
+  for (uint8_t i = 0; i < zones; i++) {
+    if (results->distance_mm[i] > 0 && results->distance_mm[i] < 4000) {
+      sum += results->distance_mm[i];
+      valid++;
+    }
+  }
+  if (valid == 0) return -1;
+  float mean = sum / valid;
+
+  // Second pass: variance
+  float varSum = 0;
+  for (uint8_t i = 0; i < zones; i++) {
+    if (results->distance_mm[i] > 0 && results->distance_mm[i] < 4000) {
+      float diff = results->distance_mm[i] - mean;
+      varSum += diff * diff;
+    }
+  }
+  return sqrt(varSum / valid);
 }
