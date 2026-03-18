@@ -16,6 +16,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -23,12 +24,12 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-
 // Measure average interval between frames over N frames
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 03: Ranging Frequency ==="));
   Serial.println();
@@ -38,7 +39,8 @@ void setup() {
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000)) {
     Serial.println(F("Init failed!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // Use 4x4 for max frequency range (up to 60 Hz)
@@ -121,7 +123,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
@@ -142,7 +144,8 @@ float measureFrameInterval(uint8_t numFrames) {
   // Wait for first frame
   unsigned long timeout = millis() + 5000;
   while (!vl53l5cx.isDataReady()) {
-    if (millis() > timeout) return -1;
+    if (millis() > timeout)
+      return -1;
     delay(1);
   }
   vl53l5cx.getRangingData(&results);
@@ -151,7 +154,8 @@ float measureFrameInterval(uint8_t numFrames) {
   for (uint8_t i = 0; i < numFrames; i++) {
     timeout = millis() + 5000;
     while (!vl53l5cx.isDataReady()) {
-      if (millis() > timeout) return -1;
+      if (millis() > timeout)
+        return -1;
       delay(1);
     }
     vl53l5cx.getRangingData(&results);

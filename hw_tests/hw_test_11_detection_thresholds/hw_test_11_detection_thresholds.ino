@@ -20,6 +20,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -31,7 +32,8 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 11: Detection Thresholds ==="));
   Serial.println();
@@ -92,10 +94,11 @@ void setup() {
   Serial.print(F(", high="));
   Serial.println(readBack[0].param_high_thresh);
 
-  bool valuesMatch = getOk && (readBack[0].zone_num == 0) &&
-                     (readBack[0].measurement == VL53L5CX_DISTANCE_MM) &&
-                     (readBack[0].type == VL53L5CX_LESS_THAN_EQUAL_MIN_CHECKER) &&
-                     (readBack[0].param_low_thresh == 500);
+  bool valuesMatch =
+      getOk && (readBack[0].zone_num == 0) &&
+      (readBack[0].measurement == VL53L5CX_DISTANCE_MM) &&
+      (readBack[0].type == VL53L5CX_LESS_THAN_EQUAL_MIN_CHECKER) &&
+      (readBack[0].param_low_thresh == 500);
   report("4. getDetectionThresholds() values match", valuesMatch);
 
   // Test 5: Disable thresholds and verify
@@ -139,7 +142,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));

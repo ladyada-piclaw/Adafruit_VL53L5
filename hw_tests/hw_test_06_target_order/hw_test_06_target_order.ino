@@ -15,6 +15,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -24,7 +25,8 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 06: Target Order ==="));
   Serial.println();
@@ -34,7 +36,8 @@ void setup() {
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000)) {
     Serial.println(F("Init failed!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   vl53l5cx.setResolution(16);
@@ -46,28 +49,31 @@ void setup() {
   Serial.println(order);
   report("1. Default target order readable",
          order == VL53L5CX_TARGET_ORDER_CLOSEST ||
-         order == VL53L5CX_TARGET_ORDER_STRONGEST);
+             order == VL53L5CX_TARGET_ORDER_STRONGEST);
 
   // Test 2: Set CLOSEST
   bool setC = vl53l5cx.setTargetOrder(VL53L5CX_TARGET_ORDER_CLOSEST);
   order = vl53l5cx.getTargetOrder();
   Serial.print(F("   Set CLOSEST, readback: "));
   Serial.println(order);
-  report("2. Set/get CLOSEST (1)", setC && order == VL53L5CX_TARGET_ORDER_CLOSEST);
+  report("2. Set/get CLOSEST (1)",
+         setC && order == VL53L5CX_TARGET_ORDER_CLOSEST);
 
   // Test 3: Set STRONGEST
   bool setS = vl53l5cx.setTargetOrder(VL53L5CX_TARGET_ORDER_STRONGEST);
   order = vl53l5cx.getTargetOrder();
   Serial.print(F("   Set STRONGEST, readback: "));
   Serial.println(order);
-  report("3. Set/get STRONGEST (2)", setS && order == VL53L5CX_TARGET_ORDER_STRONGEST);
+  report("3. Set/get STRONGEST (2)",
+         setS && order == VL53L5CX_TARGET_ORDER_STRONGEST);
 
   // Test 4: Switch back to CLOSEST
   bool setBack = vl53l5cx.setTargetOrder(VL53L5CX_TARGET_ORDER_CLOSEST);
   order = vl53l5cx.getTargetOrder();
   Serial.print(F("   Back to CLOSEST, readback: "));
   Serial.println(order);
-  report("4. Switch back to CLOSEST", setBack && order == VL53L5CX_TARGET_ORDER_CLOSEST);
+  report("4. Switch back to CLOSEST",
+         setBack && order == VL53L5CX_TARGET_ORDER_CLOSEST);
 
   VL53L5CX_ResultsData results;
 
@@ -122,7 +128,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
@@ -133,7 +139,7 @@ void report(const char *name, bool ok) {
   }
 }
 
-bool waitAndRead(VL53L5CX_ResultsData *results) {
+bool waitAndRead(VL53L5CX_ResultsData* results) {
   unsigned long start = millis();
   while (millis() - start < 5000) {
     if (vl53l5cx.isDataReady()) {

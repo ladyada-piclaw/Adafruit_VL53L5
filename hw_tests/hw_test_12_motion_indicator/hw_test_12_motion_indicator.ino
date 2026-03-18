@@ -16,6 +16,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -26,7 +27,8 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 12: Motion Indicator ==="));
   Serial.println();
@@ -36,7 +38,8 @@ void setup() {
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000)) {
     Serial.println(F("Init failed!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // Set 8x8 resolution, 15Hz
@@ -68,7 +71,7 @@ void setup() {
 
   uint8_t framesCollected = 0;
   uint8_t framesWithMotion = 0;
-  unsigned long timeout = millis() + 10000;  // 10 second timeout
+  unsigned long timeout = millis() + 10000; // 10 second timeout
 
   while (framesCollected < 20 && millis() < timeout) {
     if (vl53l5cx.isDataReady()) {
@@ -136,7 +139,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));

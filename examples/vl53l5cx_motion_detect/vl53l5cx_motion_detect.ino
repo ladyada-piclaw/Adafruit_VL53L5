@@ -22,7 +22,8 @@ VL53L5CX_ResultsData results;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("Adafruit VL53L5CX Motion Detection Demo"));
   Serial.println(F("========================================"));
@@ -30,7 +31,8 @@ void setup() {
 
   if (!vl53l5cx.begin()) {
     Serial.println(F("Failed to initialize VL53L5CX sensor!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.println(F("Sensor initialized!"));
@@ -63,7 +65,8 @@ void setup() {
   // Start ranging
   if (!vl53l5cx.startRanging()) {
     Serial.println(F("Failed to start ranging!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.println(F("Starting motion detection...\n"));
@@ -103,7 +106,7 @@ void loop() {
     }
   }
 
-  delay(5);  // Small delay between polling
+  delay(5); // Small delay between polling
 }
 
 // Print the 4x8 motion grid

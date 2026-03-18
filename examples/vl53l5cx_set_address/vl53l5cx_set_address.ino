@@ -28,7 +28,6 @@ void setup() {
   Serial.println("========================================");
   Serial.println();
 
-
   Serial.print("Initializing sensor at default address 0x");
   Serial.print(DEFAULT_ADDRESS, HEX);
   Serial.println("...");

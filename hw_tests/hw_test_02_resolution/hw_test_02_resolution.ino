@@ -15,6 +15,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -24,7 +25,8 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 02: Resolution ==="));
   Serial.println();
@@ -34,7 +36,8 @@ void setup() {
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000)) {
     Serial.println(F("Init failed!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   VL53L5CX_ResultsData results;
@@ -115,7 +118,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
@@ -126,7 +129,7 @@ void report(const char *name, bool ok) {
   }
 }
 
-bool waitAndRead(VL53L5CX_ResultsData *results) {
+bool waitAndRead(VL53L5CX_ResultsData* results) {
   unsigned long start = millis();
   while (millis() - start < 5000) {
     if (vl53l5cx.isDataReady()) {

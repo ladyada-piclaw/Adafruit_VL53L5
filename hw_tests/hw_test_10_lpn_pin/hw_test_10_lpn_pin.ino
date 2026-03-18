@@ -18,6 +18,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 #ifdef ESP32
@@ -33,7 +34,8 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 10: LPn Pin ==="));
   Serial.println();
@@ -55,7 +57,8 @@ void setup() {
   report("2. begin() succeeds", initOk);
   if (!initOk) {
     Serial.println(F("Init failed, cannot continue."));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // Test 3: Pull LPn LOW — sensor should disappear
@@ -122,7 +125,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));

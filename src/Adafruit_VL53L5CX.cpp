@@ -35,8 +35,8 @@ Adafruit_VL53L5CX::~Adafruit_VL53L5CX() {
  * @param i2c_clock I2C clock speed in Hz (default 400000)
  * @return true on success, false on failure
  */
-bool Adafruit_VL53L5CX::begin(uint8_t address, TwoWire *wire,
-                               uint32_t i2c_clock) {
+bool Adafruit_VL53L5CX::begin(uint8_t address, TwoWire* wire,
+                              uint32_t i2c_clock) {
   if (_i2c_dev) {
     delete _i2c_dev;
   }
@@ -111,7 +111,7 @@ bool Adafruit_VL53L5CX::isDataReady(void) {
  * @param results Pointer to results structure to fill
  * @return true on success
  */
-bool Adafruit_VL53L5CX::getRangingData(VL53L5CX_ResultsData *results) {
+bool Adafruit_VL53L5CX::getRangingData(VL53L5CX_ResultsData* results) {
   if (!_initialized || !results) {
     return false;
   }
@@ -380,7 +380,7 @@ bool Adafruit_VL53L5CX::getDetectionThresholdsEnable(void) {
  * @return true on success
  */
 bool Adafruit_VL53L5CX::setDetectionThresholds(
-    VL53L5CX_DetectionThresholds *thresholds) {
+    VL53L5CX_DetectionThresholds* thresholds) {
   if (!_initialized || !thresholds) {
     return false;
   }
@@ -394,7 +394,7 @@ bool Adafruit_VL53L5CX::setDetectionThresholds(
  * @return true on success
  */
 bool Adafruit_VL53L5CX::getDetectionThresholds(
-    VL53L5CX_DetectionThresholds *thresholds) {
+    VL53L5CX_DetectionThresholds* thresholds) {
   if (!_initialized || !thresholds) {
     return false;
   }
@@ -444,9 +444,8 @@ bool Adafruit_VL53L5CX::setMotionResolution(uint8_t resolution) {
   if (!_initialized) {
     return false;
   }
-  return (vl53l5cx_motion_indicator_set_resolution(&_config, &_motion_config,
-                                                   resolution) ==
-          VL53L5CX_STATUS_OK);
+  return (vl53l5cx_motion_indicator_set_resolution(
+              &_config, &_motion_config, resolution) == VL53L5CX_STATUS_OK);
 }
 
 // --- Xtalk Calibration ---
@@ -460,8 +459,8 @@ bool Adafruit_VL53L5CX::setMotionResolution(uint8_t resolution) {
  * @return true on success
  */
 bool Adafruit_VL53L5CX::calibrateXtalk(uint16_t reflectance_percent,
-                                        uint8_t nb_samples,
-                                        uint16_t distance_mm) {
+                                       uint8_t nb_samples,
+                                       uint16_t distance_mm) {
   if (!_initialized) {
     return false;
   }
@@ -474,7 +473,7 @@ bool Adafruit_VL53L5CX::calibrateXtalk(uint16_t reflectance_percent,
  * @param data Buffer of VL53L5CX_XTALK_BUFFER_SIZE bytes
  * @return true on success
  */
-bool Adafruit_VL53L5CX::getXtalkCalData(uint8_t *data) {
+bool Adafruit_VL53L5CX::getXtalkCalData(uint8_t* data) {
   if (!_initialized) {
     return false;
   }
@@ -486,7 +485,7 @@ bool Adafruit_VL53L5CX::getXtalkCalData(uint8_t *data) {
  * @param data Buffer of VL53L5CX_XTALK_BUFFER_SIZE bytes
  * @return true on success
  */
-bool Adafruit_VL53L5CX::setXtalkCalData(uint8_t *data) {
+bool Adafruit_VL53L5CX::setXtalkCalData(uint8_t* data) {
   if (!_initialized) {
     return false;
   }
@@ -498,7 +497,7 @@ bool Adafruit_VL53L5CX::setXtalkCalData(uint8_t *data) {
  * @param margin Pointer to store margin value
  * @return true on success
  */
-bool Adafruit_VL53L5CX::getXtalkMargin(uint32_t *margin) {
+bool Adafruit_VL53L5CX::getXtalkMargin(uint32_t* margin) {
   if (!_initialized) {
     return false;
   }

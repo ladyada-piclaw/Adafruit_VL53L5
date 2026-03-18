@@ -32,7 +32,8 @@ String inputBuffer = "";
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("VL53L5CX WebSerial Demo"));
   Serial.println(F("======================="));
@@ -40,7 +41,8 @@ void setup() {
 
   if (!vl53l5cx.begin()) {
     Serial.println(F("ERROR: Failed to initialize VL53L5CX sensor!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.println(F("Sensor initialized!"));
@@ -58,7 +60,8 @@ void setup() {
   // Start ranging
   if (!vl53l5cx.startRanging()) {
     Serial.println(F("ERROR: Failed to start ranging!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.print(F("Resolution: "));
@@ -80,7 +83,7 @@ void loop() {
     }
   }
 
-  delay(5);  // Small delay between polling
+  delay(5); // Small delay between polling
 }
 
 /**************************************************************************/
@@ -186,7 +189,7 @@ void outputFrame(void) {
     @param  count Number of elements to output
 */
 /**************************************************************************/
-void outputDataArray(int16_t *data, uint8_t count) {
+void outputDataArray(int16_t* data, uint8_t count) {
   for (uint8_t i = 0; i < count; i++) {
     Serial.print(data[i]);
     if (i < count - 1) {
@@ -203,7 +206,7 @@ void outputDataArray(int16_t *data, uint8_t count) {
     @param  count Number of elements to output
 */
 /**************************************************************************/
-void outputStatusArray(uint8_t *data, uint8_t count) {
+void outputStatusArray(uint8_t* data, uint8_t count) {
   for (uint8_t i = 0; i < count; i++) {
     Serial.print(data[i]);
     if (i < count - 1) {

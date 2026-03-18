@@ -31,18 +31,18 @@
  * @brief Class for VL53L5CX ToF sensor
  */
 class Adafruit_VL53L5CX {
-public:
+ public:
   Adafruit_VL53L5CX();
   ~Adafruit_VL53L5CX();
 
-  bool begin(uint8_t address = VL53L5CX_DEFAULT_ADDRESS,
-             TwoWire *wire = &Wire, uint32_t i2c_clock = 400000);
+  bool begin(uint8_t address = VL53L5CX_DEFAULT_ADDRESS, TwoWire* wire = &Wire,
+             uint32_t i2c_clock = 400000);
 
   bool startRanging(void);
   bool stopRanging(void);
 
   bool isDataReady(void);
-  bool getRangingData(VL53L5CX_ResultsData *results);
+  bool getRangingData(VL53L5CX_ResultsData* results);
 
   bool setResolution(uint8_t resolution);
   uint8_t getResolution(void);
@@ -70,8 +70,8 @@ public:
   // Detection Thresholds
   bool setDetectionThresholdsEnable(bool enable);
   bool getDetectionThresholdsEnable(void);
-  bool setDetectionThresholds(VL53L5CX_DetectionThresholds *thresholds);
-  bool getDetectionThresholds(VL53L5CX_DetectionThresholds *thresholds);
+  bool setDetectionThresholds(VL53L5CX_DetectionThresholds* thresholds);
+  bool getDetectionThresholds(VL53L5CX_DetectionThresholds* thresholds);
 
   // Motion Indicator
   bool initMotionIndicator(uint8_t resolution);
@@ -81,15 +81,17 @@ public:
   // Xtalk Calibration
   bool calibrateXtalk(uint16_t reflectance_percent, uint8_t nb_samples,
                       uint16_t distance_mm);
-  bool getXtalkCalData(uint8_t *data);
-  bool setXtalkCalData(uint8_t *data);
-  bool getXtalkMargin(uint32_t *margin);
+  bool getXtalkCalData(uint8_t* data);
+  bool setXtalkCalData(uint8_t* data);
+  bool getXtalkMargin(uint32_t* margin);
   bool setXtalkMargin(uint32_t margin);
 
-  VL53L5CX_Configuration *getConfig(void) { return &_config; }
+  VL53L5CX_Configuration* getConfig(void) {
+    return &_config;
+  }
 
-private:
-  Adafruit_I2CDevice *_i2c_dev = nullptr;
+ private:
+  Adafruit_I2CDevice* _i2c_dev = nullptr;
   VL53L5CX_Configuration _config;
   bool _initialized = false;
   VL53L5CX_Motion_Configuration _motion_config;

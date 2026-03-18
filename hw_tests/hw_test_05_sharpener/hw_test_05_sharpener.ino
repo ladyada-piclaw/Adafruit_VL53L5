@@ -16,6 +16,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -23,13 +24,12 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-
-
 // Compute standard deviation of distance_mm across zones
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 05: Sharpener ==="));
   Serial.println();
@@ -39,7 +39,8 @@ void setup() {
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000)) {
     Serial.println(F("Init failed!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // Use 8x8 for more zones to see sharpener effect
@@ -140,7 +141,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
@@ -151,7 +152,7 @@ void report(const char *name, bool ok) {
   }
 }
 
-bool waitAndRead(VL53L5CX_ResultsData *results) {
+bool waitAndRead(VL53L5CX_ResultsData* results) {
   unsigned long start = millis();
   while (millis() - start < 5000) {
     if (vl53l5cx.isDataReady()) {
@@ -162,7 +163,7 @@ bool waitAndRead(VL53L5CX_ResultsData *results) {
   return false;
 }
 
-float distanceStdDev(VL53L5CX_ResultsData *results, uint8_t zones) {
+float distanceStdDev(VL53L5CX_ResultsData* results, uint8_t zones) {
   // First pass: mean
   float sum = 0;
   uint8_t valid = 0;
@@ -172,7 +173,8 @@ float distanceStdDev(VL53L5CX_ResultsData *results, uint8_t zones) {
       valid++;
     }
   }
-  if (valid == 0) return -1;
+  if (valid == 0)
+    return -1;
   float mean = sum / valid;
 
   // Second pass: variance

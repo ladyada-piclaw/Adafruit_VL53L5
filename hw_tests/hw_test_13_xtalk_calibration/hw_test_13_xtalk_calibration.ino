@@ -20,6 +20,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -31,7 +32,8 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 13: Xtalk Calibration ==="));
   Serial.println();
@@ -110,9 +112,11 @@ void setup() {
   printSummary();
 }
 
-void loop() { delay(1000); }
+void loop() {
+  delay(1000);
+}
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));

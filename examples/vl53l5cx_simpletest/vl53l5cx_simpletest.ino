@@ -9,15 +9,16 @@
  * Written by Limor 'ladyada' Fried with assistance from Claude Code
  */
 
-#include <Wire.h>
 #include <Adafruit_VL53L5CX.h>
+#include <Wire.h>
 
 Adafruit_VL53L5CX vl53l5cx;
 VL53L5CX_ResultsData results;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println("Adafruit VL53L5CX simpletest");
   Serial.println("============================");
@@ -28,7 +29,8 @@ void setup() {
 
   if (!vl53l5cx.begin()) {
     Serial.println("Failed to initialize VL53L5CX sensor!");
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.println("Sensor initialized!");
@@ -46,7 +48,8 @@ void setup() {
   // Start ranging
   if (!vl53l5cx.startRanging()) {
     Serial.println("Failed to start ranging!");
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.print("Resolution: ");

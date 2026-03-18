@@ -38,16 +38,18 @@ const char densityRamp[] = " .oO08@#MW";
 const char densityRamp[] = " .:+#@";
 #elif RAMP_SELECT == 5
 // 70-char full Paul Bourke ramp: maximum smoothness
-const char densityRamp[] = " .'`^\",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+const char densityRamp[] =
+    " .'`^\",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 #endif
 
 const int rampLength = sizeof(densityRamp) - 1; // auto-calculated
-const int minDist = 200;   // mm - closest (maps to last char)
-const int maxDist = 2000;  // mm - farthest (maps to ' ')
+const int minDist = 200;  // mm - closest (maps to last char)
+const int maxDist = 2000; // mm - farthest (maps to ' ')
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("Adafruit VL53L5CX ASCII Art Demo"));
   Serial.println(F("================================="));
@@ -55,7 +57,8 @@ void setup() {
 
   if (!vl53l5cx.begin()) {
     Serial.println(F("Failed to initialize VL53L5CX sensor!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.println(F("Sensor initialized!"));
@@ -73,7 +76,8 @@ void setup() {
   // Start ranging
   if (!vl53l5cx.startRanging()) {
     Serial.println(F("Failed to start ranging!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   Serial.println(F("Starting ASCII art display...\n"));
@@ -101,20 +105,21 @@ void loop() {
     }
   }
 
-  delay(5);  // Small delay between polling
+  delay(5); // Small delay between polling
 }
 
 // Convert distance to ASCII character
 char distanceToChar(int16_t distance_mm) {
   if (distance_mm <= minDist) {
-    return densityRamp[rampLength - 1];  // '@' for very close
+    return densityRamp[rampLength - 1]; // '@' for very close
   }
   if (distance_mm >= maxDist) {
-    return densityRamp[0];  // ' ' for very far
+    return densityRamp[0]; // ' ' for very far
   }
 
   // Linear mapping: closer = higher index (denser character)
-  int idx = (int)((long)(maxDist - distance_mm) * (rampLength - 1) / (maxDist - minDist));
+  int idx = (int)((long)(maxDist - distance_mm) * (rampLength - 1) /
+                  (maxDist - minDist));
   return densityRamp[idx];
 }
 
@@ -132,11 +137,11 @@ void printGrid() {
       if (status == 5 || status == 9) {
         c = distanceToChar(results.distance_mm[idx]);
       } else {
-        c = '?';  // Invalid zone
+        c = '?'; // Invalid zone
       }
 
       Serial.print(c);
-      Serial.print(' ');  // Space between chars for square aspect ratio
+      Serial.print(' '); // Space between chars for square aspect ratio
     }
     Serial.println();
   }

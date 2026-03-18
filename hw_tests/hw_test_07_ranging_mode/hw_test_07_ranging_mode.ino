@@ -16,6 +16,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 Adafruit_VL53L5CX vl53l5cx;
@@ -25,7 +26,8 @@ uint8_t failed = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 07: Ranging Mode ==="));
   Serial.println();
@@ -35,7 +37,8 @@ void setup() {
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000)) {
     Serial.println(F("Init failed!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   vl53l5cx.setResolution(16);
@@ -47,28 +50,31 @@ void setup() {
   Serial.println(mode);
   report("1. Default ranging mode readable",
          mode == VL53L5CX_RANGING_MODE_CONTINUOUS ||
-         mode == VL53L5CX_RANGING_MODE_AUTONOMOUS);
+             mode == VL53L5CX_RANGING_MODE_AUTONOMOUS);
 
   // Test 2: Set CONTINUOUS
   bool setC = vl53l5cx.setRangingMode(VL53L5CX_RANGING_MODE_CONTINUOUS);
   mode = vl53l5cx.getRangingMode();
   Serial.print(F("   Set CONTINUOUS, readback: "));
   Serial.println(mode);
-  report("2. Set/get CONTINUOUS (1)", setC && mode == VL53L5CX_RANGING_MODE_CONTINUOUS);
+  report("2. Set/get CONTINUOUS (1)",
+         setC && mode == VL53L5CX_RANGING_MODE_CONTINUOUS);
 
   // Test 3: Set AUTONOMOUS
   bool setA = vl53l5cx.setRangingMode(VL53L5CX_RANGING_MODE_AUTONOMOUS);
   mode = vl53l5cx.getRangingMode();
   Serial.print(F("   Set AUTONOMOUS, readback: "));
   Serial.println(mode);
-  report("3. Set/get AUTONOMOUS (3)", setA && mode == VL53L5CX_RANGING_MODE_AUTONOMOUS);
+  report("3. Set/get AUTONOMOUS (3)",
+         setA && mode == VL53L5CX_RANGING_MODE_AUTONOMOUS);
 
   // Test 4: Switch back
   bool setBack = vl53l5cx.setRangingMode(VL53L5CX_RANGING_MODE_CONTINUOUS);
   mode = vl53l5cx.getRangingMode();
   Serial.print(F("   Back to CONTINUOUS, readback: "));
   Serial.println(mode);
-  report("4. Switch back to CONTINUOUS", setBack && mode == VL53L5CX_RANGING_MODE_CONTINUOUS);
+  report("4. Switch back to CONTINUOUS",
+         setBack && mode == VL53L5CX_RANGING_MODE_CONTINUOUS);
 
   VL53L5CX_ResultsData results;
 
@@ -153,7 +159,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
@@ -164,7 +170,7 @@ void report(const char *name, bool ok) {
   }
 }
 
-bool waitAndRead(VL53L5CX_ResultsData *results) {
+bool waitAndRead(VL53L5CX_ResultsData* results) {
   unsigned long start = millis();
   while (millis() - start < 5000) {
     if (vl53l5cx.isDataReady()) {
@@ -184,7 +190,8 @@ float measureFrameInterval(uint8_t numFrames) {
   // Wait for first
   unsigned long timeout = millis() + 5000;
   while (!vl53l5cx.isDataReady()) {
-    if (millis() > timeout) return -1;
+    if (millis() > timeout)
+      return -1;
     delay(1);
   }
   vl53l5cx.getRangingData(&results);
@@ -193,7 +200,8 @@ float measureFrameInterval(uint8_t numFrames) {
   for (uint8_t i = 0; i < numFrames; i++) {
     timeout = millis() + 5000;
     while (!vl53l5cx.isDataReady()) {
-      if (millis() > timeout) return -1;
+      if (millis() > timeout)
+        return -1;
       delay(1);
     }
     vl53l5cx.getRangingData(&results);

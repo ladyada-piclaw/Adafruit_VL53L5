@@ -17,6 +17,7 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
+
 #include "hw_test_helper.h"
 
 #ifdef ESP32
@@ -30,12 +31,12 @@ Adafruit_VL53L5CX vl53l5cx;
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-
 // Wait for INT pin to reach target state, with timeout
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   Serial.println(F("=== HW Test 09: INT Pin ==="));
   Serial.println();
@@ -46,7 +47,8 @@ void setup() {
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000)) {
     Serial.println(F("Init failed!"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // Test 1: INT high before ranging
@@ -117,7 +119,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char *name, bool ok) {
+void report(const char* name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
