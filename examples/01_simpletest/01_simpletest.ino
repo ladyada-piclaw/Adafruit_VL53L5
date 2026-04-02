@@ -69,8 +69,7 @@ void loop() {
 
       // Print distance array
       // Zone order from ST library: index = col + row*width
-      // Print with decreasing x (left-right mirror) and increasing y
-      for (int x = width - 1; x >= 0; x--) {
+      for (int x = 0; x < width; x++) {
         for (int y = 0; y <= width * (width - 1); y += width) {
           int idx = x + y;
           Serial.print("\t");
