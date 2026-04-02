@@ -78,9 +78,7 @@ void loop() {
       // Print the 8x8 grid
       printGrid();
 
-      // Print legend
       Serial.println();
-      printLegend();
     }
   }
 
