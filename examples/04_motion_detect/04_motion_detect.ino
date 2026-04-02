@@ -1,11 +1,11 @@
 /*!
- * @file vl53l5cx_motion_detect.ino
+ * @file 04_motion_detect.ino
  *
- * Motion detection example for Adafruit VL53L5CX 8x8 ToF sensor
+ * Motion detection example for Adafruit VL53L5CX ToF sensor
  *
  * Demonstrates the motion indicator feature which detects movement
- * within the sensor's field of view. The 8x8 grid is divided into
- * 32 motion aggregates (each covering 2 zones).
+ * within the sensor's field of view. Uses 4x4 resolution which gives
+ * 16 motion aggregates with clean 1:1 zone mapping.
  *
  * Uses ANSI escape codes for smooth terminal animation.
  *
@@ -15,7 +15,6 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
-#include <Wire.h>
 
 Adafruit_VL53L5CX vl53l5cx;
 VL53L5CX_ResultsData results;
@@ -37,8 +36,8 @@ void setup() {
 
   Serial.println(F("Sensor initialized!"));
 
-  // Set 8x8 resolution (64 zones)
-  if (!vl53l5cx.setResolution(64)) {
+  // Use 4x4 resolution (16 zones = 16 motion aggregates)
+  if (!vl53l5cx.setResolution(16)) {
     Serial.println(F("Failed to set resolution!"));
   }
 
@@ -50,14 +49,12 @@ void setup() {
   // Stop ranging before initializing motion indicator
   vl53l5cx.stopRanging();
 
-  // Initialize motion indicator with 8x8 resolution (64)
-  // This creates 32 motion aggregates (each covers 2 zones)
-  if (!vl53l5cx.initMotionIndicator(64)) {
+  // Initialize motion indicator with 4x4 resolution (16)
+  if (!vl53l5cx.initMotionIndicator(16)) {
     Serial.println(F("Failed to init motion indicator!"));
   }
 
   // Set motion detection distance range: 400mm to 1500mm
-  // Motion is only detected for objects within this range
   if (!vl53l5cx.setMotionDistance(400, 1500)) {
     Serial.println(F("Failed to set motion distance!"));
   }
@@ -82,8 +79,8 @@ void loop() {
       // Cursor home - animate in place
       Serial.print(F("\033[H"));
 
-      Serial.println(F("VL53L5CX Motion Detection"));
-      Serial.println(F("=========================\n"));
+      Serial.println(F("VL53L5CX Motion Detection (4x4)"));
+      Serial.println(F("===============================\n"));
 
       uint8_t aggregates = results.motion_indicator.nb_of_detected_aggregates;
 
@@ -95,54 +92,34 @@ void loop() {
         Serial.println(F("    No motion              \n"));
       }
 
-      // Print motion grid (4 rows x 8 columns = 32 aggregates)
-      Serial.println(F("Motion Grid (32 aggregates):"));
-      printMotionGrid();
+      // Print 4x4 motion grid
+      for (uint8_t row = 0; row < 4; row++) {
+        for (uint8_t col = 0; col < 4; col++) {
+          uint8_t idx = row * 4 + col;
+          uint32_t motion = results.motion_indicator.motion[idx];
 
-      // Print legend
-      Serial.println();
-      Serial.println(F("Legend: [0]=no motion, [>0]=motion detected"));
-      Serial.println(F("Range: 400mm to 1500mm"));
-    }
-  }
-
-  delay(5); // Small delay between polling
-}
-
-// Print the 4x8 motion grid
-void printMotionGrid() {
-  for (uint8_t row = 0; row < 4; row++) {
-    for (uint8_t col = 0; col < 8; col++) {
-      uint8_t idx = row * 8 + col;
-      uint32_t motion = results.motion_indicator.motion[idx];
-
-      // Print with fixed width for alignment
-      if (motion > 0) {
-        Serial.print(F("["));
-        printPadded(motion, 4);
-        Serial.print(F("]"));
-      } else {
-        Serial.print(F("[  . ]"));
+          Serial.print(F("["));
+          if (motion > 0) {
+            // Print with padding for alignment
+            if (motion < 10)
+              Serial.print(F("   "));
+            else if (motion < 100)
+              Serial.print(F("  "));
+            else if (motion < 1000)
+              Serial.print(F(" "));
+            Serial.print(motion);
+          } else {
+            Serial.print(F("   0"));
+          }
+          Serial.print(F("] "));
+        }
+        Serial.println();
       }
-      Serial.print(F(" "));
+
+      Serial.println();
+      Serial.println(F("Range: 400mm to 1500mm         "));
     }
-    Serial.println();
-  }
-}
-
-// Print a number with padding
-void printPadded(uint32_t value, uint8_t width) {
-  // Calculate digits
-  uint32_t temp = value;
-  uint8_t digits = 1;
-  while (temp >= 10) {
-    temp /= 10;
-    digits++;
   }
 
-  // Print leading spaces
-  for (uint8_t i = digits; i < width; i++) {
-    Serial.print(F(" "));
-  }
-  Serial.print(value);
+  delay(5);
 }
