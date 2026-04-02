@@ -295,10 +295,10 @@ function renderFrame() {
 
       const dist = Math.round(displayGrid[r][c]);
       if (dist > 0 && dist < 4000) {
-        cell.textContent = dist;
+        cell.textContent = (interpValue === 'none') ? dist : '';
         cell.style.backgroundColor = distanceToColor(dist);
       } else {
-        cell.textContent = '--';
+        cell.textContent = (interpValue === 'none') ? '--' : '';
         cell.style.backgroundColor = '#4a4a6a';
       }
     }
