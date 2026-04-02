@@ -28,6 +28,7 @@ const currentResDisplay = document.getElementById('current-res');
 const currentRateDisplay = document.getElementById('current-rate');
 const distanceGrid = document.getElementById('distance-grid');
 const serialLog = document.getElementById('serial-log');
+const interpSelect = document.getElementById('interp-select');
 const logToggle = document.getElementById('log-toggle');
 
 // Initialize
@@ -231,44 +232,126 @@ function parseLine(line) {
 }
 
 /**
- * Render the current frame to the grid
+ * Render the current frame to the grid, with optional bicubic interpolation
  */
 function renderFrame() {
   const res = currentFrame.resolution;
   const distances = currentFrame.distances;
-  const status = currentFrame.status;
 
   // Update status displays
   currentResDisplay.textContent = res === 16 ? '4×4' : '8×8';
   currentRateDisplay.textContent = `${currentFrame.rate} Hz`;
 
-  // Check if grid size needs to change
-  const expectedSize = res === 16 ? 4 : 8;
-  const currentSize = Math.sqrt(distanceGrid.children.length);
-  if (currentSize !== expectedSize) {
-    initializeGrid(res);
+  const srcSize = res === 16 ? 4 : 8;
+  const interpValue = interpSelect.value;
+  const targetSize = interpValue === 'none' ? srcSize : parseInt(interpValue, 10);
+
+  // Build source 2D grid
+  const srcGrid = [];
+  for (let r = 0; r < srcSize; r++) {
+    srcGrid.push(distances.slice(r * srcSize, (r + 1) * srcSize));
   }
 
-  // Update each cell (mirror X to match physical sensor orientation)
-  const size = expectedSize;
-  for (let i = 0; i < res; i++) {
-    // Data is already in correct orientation from the firmware
-    const mirroredIdx = i;
+  let displayGrid;
+  let displaySize;
+  if (targetSize === srcSize) {
+    displayGrid = srcGrid;
+    displaySize = srcSize;
+  } else {
+    displayGrid = bicubicInterpolate(srcGrid, srcSize, targetSize);
+    displaySize = targetSize;
+  }
 
-    const cell = document.getElementById(`cell-${i}`);
-    if (!cell) continue;
-
-    const dist = distances[mirroredIdx];
-    const stat = status[mirroredIdx];
-
-    if (dist > 0 && dist < 4000) {
-      cell.textContent = dist;
-      cell.style.backgroundColor = distanceToColor(dist);
-    } else {
+  // Rebuild grid if size changed
+  const totalCells = displaySize * displaySize;
+  if (distanceGrid.children.length !== totalCells) {
+    distanceGrid.innerHTML = '';
+    distanceGrid.style.gridTemplateColumns = `repeat(${displaySize}, 1fr)`;
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.id = `cell-${i}`;
       cell.textContent = '--';
-      cell.style.backgroundColor = '#4a4a6a'; // Gray for no return
+      cell.style.backgroundColor = '#4a4a6a';
+      // Smaller cells for interpolated grids
+      if (displaySize > 8) {
+        cell.style.minWidth = `${Math.max(12, 320 / displaySize)}px`;
+        cell.style.minHeight = `${Math.max(12, 320 / displaySize)}px`;
+        cell.style.fontSize = displaySize > 16 ? '7px' : '9px';
+      }
+      distanceGrid.appendChild(cell);
     }
   }
+
+  // Update cells
+  for (let r = 0; r < displaySize; r++) {
+    for (let c = 0; c < displaySize; c++) {
+      const i = r * displaySize + c;
+      const cell = document.getElementById(`cell-${i}`);
+      if (!cell) continue;
+
+      const dist = Math.round(displayGrid[r][c]);
+      if (dist > 0 && dist < 4000) {
+        cell.textContent = dist;
+        cell.style.backgroundColor = distanceToColor(dist);
+      } else {
+        cell.textContent = '--';
+        cell.style.backgroundColor = '#4a4a6a';
+      }
+    }
+  }
+}
+
+/**
+ * Bicubic interpolation from srcSize×srcSize to targetSize×targetSize
+ */
+function bicubicInterpolate(srcGrid, srcSize, targetSize) {
+  const result = [];
+  for (let r = 0; r < targetSize; r++) {
+    const row = [];
+    for (let c = 0; c < targetSize; c++) {
+      // Map target pixel to source coordinates
+      const srcR = (r + 0.5) * srcSize / targetSize - 0.5;
+      const srcC = (c + 0.5) * srcSize / targetSize - 0.5;
+      row.push(bicubicSample(srcGrid, srcSize, srcR, srcC));
+    }
+    result.push(row);
+  }
+  return result;
+}
+
+/**
+ * Sample a single point from the source grid using bicubic interpolation
+ */
+function bicubicSample(grid, size, r, c) {
+  const ri = Math.floor(r);
+  const ci = Math.floor(c);
+  const dr = r - ri;
+  const dc = c - ci;
+
+  let val = 0;
+  for (let m = -1; m <= 2; m++) {
+    for (let n = -1; n <= 2; n++) {
+      const sr = Math.min(Math.max(ri + m, 0), size - 1);
+      const sc = Math.min(Math.max(ci + n, 0), size - 1);
+      val += grid[sr][sc] * cubicWeight(m - dr) * cubicWeight(n - dc);
+    }
+  }
+  return Math.max(0, val);
+}
+
+/**
+ * Cubic interpolation kernel (Catmull-Rom, a=-0.5)
+ */
+function cubicWeight(x) {
+  const a = -0.5;
+  const abs = Math.abs(x);
+  if (abs <= 1) {
+    return (a + 2) * abs * abs * abs - (a + 3) * abs * abs + 1;
+  } else if (abs < 2) {
+    return a * abs * abs * abs - 5 * a * abs * abs + 8 * a * abs - 4 * a;
+  }
+  return 0;
 }
 
 /**
