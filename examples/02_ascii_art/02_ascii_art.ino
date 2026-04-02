@@ -106,8 +106,8 @@ char distanceToChar(int16_t distance_mm) {
 void printGrid() {
   const uint8_t width = 8;
 
-  for (int y = 0; y <= width * (width - 1); y += width) {
-    for (int x = width - 1; x >= 0; x--) {
+  for (int x = width - 1; x >= 0; x--) {
+    for (int y = width * (width - 1); y >= 0; y -= width) {
       int idx = x + y;
       uint8_t status = results.target_status[idx];
 
