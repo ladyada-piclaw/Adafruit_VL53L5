@@ -340,7 +340,7 @@ function bicubicSample(grid, size, r, c) {
       val += grid[sr][sc] * cubicWeight(m - dr) * cubicWeight(n - dc);
     }
   }
-  return Math.max(0, val);
+  return Math.max(1, Math.min(val, 3999));
 }
 
 /**
