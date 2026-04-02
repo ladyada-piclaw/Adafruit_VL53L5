@@ -19,7 +19,6 @@
 
 #include <Adafruit_VL53L5CX.h>
 
-#include "hw_test_helper.h"
 
 #ifdef ESP32
 #define LPN_PIN 32
@@ -44,7 +43,6 @@ void setup() {
   pinMode(LPN_PIN, INPUT);
   delay(100);
 
-  HW_TEST_I2C_INIT();
 
   // Test 1: Sensor on I2C with LPn HIGH
   bool found = i2cPresent(0x29);
@@ -53,7 +51,7 @@ void setup() {
   report("1. Sensor on I2C (LPn HIGH)", found);
 
   // Test 2: begin() succeeds
-  bool initOk = vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000);
+  bool initOk = vl53l5cx.begin(0x29, &Wire, 1000000);
   report("2. begin() succeeds", initOk);
   if (!initOk) {
     Serial.println(F("Init failed, cannot continue."));
@@ -79,7 +77,7 @@ void setup() {
   report("4. Sensor back (LPn HIGH)", back);
 
   // Test 5: begin() succeeds after reset
-  bool reinitOk = vl53l5cx.begin(0x29, &HW_TEST_WIRE, 1000000);
+  bool reinitOk = vl53l5cx.begin(0x29, &Wire, 1000000);
   report("5. begin() after reset", reinitOk);
 
   // Test 6: Ranging works after reset
@@ -137,6 +135,6 @@ void report(const char* name, bool ok) {
 }
 
 bool i2cPresent(uint8_t addr) {
-  HW_TEST_WIRE.beginTransmission(addr);
-  return (HW_TEST_WIRE.endTransmission() == 0);
+  Wire.beginTransmission(addr);
+  return (Wire.endTransmission() == 0);
 }
