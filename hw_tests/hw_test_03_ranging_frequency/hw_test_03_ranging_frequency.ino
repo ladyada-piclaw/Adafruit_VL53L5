@@ -1,29 +1,28 @@
 /*!
  * @file hw_test_03_ranging_frequency.ino
  *
- * Hardware test: VL53L5CX ranging frequency set/get and timing
+ * Hardware test: VL53L5CX ranging frequency set/get and actual timing
  *
- * Tests:
- *  1. Set frequency 1 Hz, readback matches
- *  2. Set frequency 5 Hz, readback matches
- *  3. Set frequency 15 Hz, readback matches
- *  4. Set frequency 30 Hz, readback matches (4x4 only)
- *  5. Set frequency 60 Hz, readback matches (4x4 only)
- *  6. Measure actual frame interval at 15 Hz (~67ms expected)
- *  7. Measure actual frame interval at 5 Hz (~200ms expected)
+ * Tests each supported frequency: set/get readback, then measure
+ * actual frame interval and verify it's within 30% of expected.
+ *
+ * Uses 4x4 resolution for max frequency range (up to 60 Hz).
  *
  * Connect VL53L5CX via STEMMA QT / I2C. No extra pins needed.
  */
 
 #include <Adafruit_VL53L5CX.h>
 
-
 Adafruit_VL53L5CX vl53l5cx;
 
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-// Measure average interval between frames over N frames
+// Frequencies to test, expected intervals, and frame counts
+const uint8_t testFreqs[] = {1, 5, 15, 30, 60};
+const float expectedMs[] = {1000.0, 200.0, 66.7, 33.3, 16.7};
+const uint8_t frameCounts[] = {3, 5, 10, 15, 20};
+const uint8_t numTests = sizeof(testFreqs) / sizeof(testFreqs[0]);
 
 void setup() {
   Serial.begin(115200);
@@ -32,7 +31,6 @@ void setup() {
 
   Serial.println(F("=== HW Test 03: Ranging Frequency ==="));
   Serial.println();
-
 
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &Wire, 1000000)) {
@@ -44,67 +42,44 @@ void setup() {
   // Use 4x4 for max frequency range (up to 60 Hz)
   vl53l5cx.setResolution(16);
 
-  // Test 1: 1 Hz
-  bool set1 = vl53l5cx.setRangingFrequency(1);
-  uint8_t freq = vl53l5cx.getRangingFrequency();
-  Serial.print(F("   Set 1 Hz, readback: "));
-  Serial.print(freq);
-  Serial.println(F(" Hz"));
-  report("1. Set/get 1 Hz", set1 && freq == 1);
+  uint8_t testNum = 1;
 
-  // Test 2: 5 Hz
-  bool set5 = vl53l5cx.setRangingFrequency(5);
-  freq = vl53l5cx.getRangingFrequency();
-  Serial.print(F("   Set 5 Hz, readback: "));
-  Serial.print(freq);
-  Serial.println(F(" Hz"));
-  report("2. Set/get 5 Hz", set5 && freq == 5);
+  for (uint8_t i = 0; i < numTests; i++) {
+    uint8_t hz = testFreqs[i];
+    float expectMs = expectedMs[i];
+    uint8_t frames = frameCounts[i];
 
-  // Test 3: 15 Hz
-  bool set15 = vl53l5cx.setRangingFrequency(15);
-  freq = vl53l5cx.getRangingFrequency();
-  Serial.print(F("   Set 15 Hz, readback: "));
-  Serial.print(freq);
-  Serial.println(F(" Hz"));
-  report("3. Set/get 15 Hz", set15 && freq == 15);
+    // Set/get readback
+    bool setOk = vl53l5cx.setRangingFrequency(hz);
+    uint8_t readback = vl53l5cx.getRangingFrequency();
+    Serial.print(F("   Set "));
+    Serial.print(hz);
+    Serial.print(F(" Hz, readback: "));
+    Serial.print(readback);
+    Serial.println(F(" Hz"));
 
-  // Test 4: 30 Hz
-  bool set30 = vl53l5cx.setRangingFrequency(30);
-  freq = vl53l5cx.getRangingFrequency();
-  Serial.print(F("   Set 30 Hz, readback: "));
-  Serial.print(freq);
-  Serial.println(F(" Hz"));
-  report("4. Set/get 30 Hz", set30 && freq == 30);
+    char label[48];
+    snprintf(label, sizeof(label), "%d. Set/get %d Hz", testNum, hz);
+    report(label, setOk && readback == hz);
+    testNum++;
 
-  // Test 5: 60 Hz
-  bool set60 = vl53l5cx.setRangingFrequency(60);
-  freq = vl53l5cx.getRangingFrequency();
-  Serial.print(F("   Set 60 Hz, readback: "));
-  Serial.print(freq);
-  Serial.println(F(" Hz"));
-  report("5. Set/get 60 Hz", set60 && freq == 60);
+    // Measure actual interval
+    vl53l5cx.startRanging();
+    float interval = measureFrameInterval(frames);
+    vl53l5cx.stopRanging();
 
-  // Test 6: Measure actual timing at 15 Hz
-  vl53l5cx.setRangingFrequency(15);
-  vl53l5cx.startRanging();
-  float interval15 = measureFrameInterval(10);
-  vl53l5cx.stopRanging();
-  Serial.print(F("   15 Hz avg interval: "));
-  Serial.print(interval15, 1);
-  Serial.println(F(" ms (expect ~67ms)"));
-  // Allow 30% tolerance
-  report("6. 15 Hz timing (~67ms)", interval15 > 45 && interval15 < 90);
+    Serial.print(F("   Measured interval: "));
+    Serial.print(interval, 1);
+    Serial.print(F(" ms (expect ~"));
+    Serial.print(expectMs, 1);
+    Serial.println(F(" ms)"));
 
-  // Test 7: Measure actual timing at 5 Hz
-  vl53l5cx.setRangingFrequency(5);
-  vl53l5cx.startRanging();
-  float interval5 = measureFrameInterval(5);
-  vl53l5cx.stopRanging();
-  Serial.print(F("   5 Hz avg interval: "));
-  Serial.print(interval5, 1);
-  Serial.println(F(" ms (expect ~200ms)"));
-  // Allow 30% tolerance
-  report("7. 5 Hz timing (~200ms)", interval5 > 140 && interval5 < 260);
+    float lo = expectMs * 0.7;
+    float hi = expectMs * 1.3;
+    snprintf(label, sizeof(label), "%d. %d Hz timing", testNum, hz);
+    report(label, interval > lo && interval < hi);
+    testNum++;
+  }
 
   // Summary
   Serial.println();
@@ -121,7 +96,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char* name, bool ok) {
+void report(const char *name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
