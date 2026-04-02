@@ -261,15 +261,12 @@ function renderFrame() {
     const dist = distances[mirroredIdx];
     const stat = status[mirroredIdx];
 
-    // Status 5 = valid, 9 = valid but high sigma
-    const isValid = (stat === 5 || stat === 9) && dist > 0 && dist < 4000;
-
-    if (isValid) {
+    if (dist > 0 && dist < 4000) {
       cell.textContent = dist;
       cell.style.backgroundColor = distanceToColor(dist);
     } else {
       cell.textContent = '--';
-      cell.style.backgroundColor = '#4a4a6a'; // Gray for invalid
+      cell.style.backgroundColor = '#4a4a6a'; // Gray for no return
     }
   }
 }
