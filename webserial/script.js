@@ -252,10 +252,8 @@ function renderFrame() {
   // Update each cell (mirror X to match physical sensor orientation)
   const size = expectedSize;
   for (let i = 0; i < res; i++) {
-    // Mirror both axes to match physical sensor orientation
-    const row = Math.floor(i / size);
-    const col = i % size;
-    const mirroredIdx = (size - 1 - col) + (size - 1 - row) * size;
+    // Data is already in correct orientation from the firmware
+    const mirroredIdx = i;
 
     const cell = document.getElementById(`cell-${i}`);
     if (!cell) continue;
