@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
   rateSelect.addEventListener('change', () => sendCommand(`RATE:${rateSelect.value}`));
   resSelect.addEventListener('change', () => sendCommand(`RES:${resSelect.value}`));
   logToggle.addEventListener('click', toggleLog);
+  interpSelect.addEventListener('change', () => {
+    if (currentFrame.distances.length > 0) renderFrame();
+  });
 
   // Initialize grid with 8x8
   initializeGrid(64);
