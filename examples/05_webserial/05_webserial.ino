@@ -171,47 +171,38 @@ void outputFrame(void) {
   Serial.print(F("RATE:"));
   Serial.println(currentRate);
 
-  // Output distances
+  // Output distances (reordered to match physical sensor orientation)
+  uint8_t width = (currentResolution == 16) ? 4 : 8;
   Serial.print(F("D:"));
-  outputDataArray(results.distance_mm, currentResolution);
+  {
+    bool first = true;
+    for (int x = width - 1; x >= 0; x--) {
+      for (int y = width * (width - 1); y >= 0; y -= width) {
+        if (!first)
+          Serial.print(F(","));
+        Serial.print(results.distance_mm[x + y]);
+        first = false;
+      }
+    }
+    Serial.println();
+  }
 
-  // Output status values
+  // Output status (same reordering)
   Serial.print(F("S:"));
-  outputStatusArray(results.target_status, currentResolution);
+  {
+    bool first = true;
+    for (int x = width - 1; x >= 0; x--) {
+      for (int y = width * (width - 1); y >= 0; y -= width) {
+        if (!first)
+          Serial.print(F(","));
+        Serial.print(results.target_status[x + y]);
+        first = false;
+      }
+    }
+    Serial.println();
+  }
 
   Serial.println(F("FRAME_END"));
 }
 
-/**************************************************************************/
-/*!
-    @brief  Output an array of int16_t values as comma-separated list
-    @param  data Pointer to the data array
-    @param  count Number of elements to output
-*/
-/**************************************************************************/
-void outputDataArray(int16_t* data, uint8_t count) {
-  for (uint8_t i = 0; i < count; i++) {
-    Serial.print(data[i]);
-    if (i < count - 1) {
-      Serial.print(F(","));
-    }
-  }
-  Serial.println();
-}
 
-/**************************************************************************/
-/*!
-    @brief  Output an array of uint8_t status values as comma-separated list
-    @param  data Pointer to the status array
-    @param  count Number of elements to output
-*/
-/**************************************************************************/
-void outputStatusArray(uint8_t* data, uint8_t count) {
-  for (uint8_t i = 0; i < count; i++) {
-    Serial.print(data[i]);
-    if (i < count - 1) {
-      Serial.print(F(","));
-    }
-  }
-  Serial.println();
-}
