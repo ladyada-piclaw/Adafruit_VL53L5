@@ -40,9 +40,9 @@ void setup() {
       delay(10);
   }
 
-  // Use 4x4 at 15 Hz — fast enough to see timing differences
+  // Use 4x4 at 60 Hz (~17ms period) so integration time dominates
   vl53l5cx.setResolution(16);
-  vl53l5cx.setRangingFrequency(15);
+  vl53l5cx.setRangingFrequency(60);
 
   uint8_t testNum = 1;
   float intervals[numTimes];
@@ -107,7 +107,7 @@ void setup() {
   VL53L5CX_ResultsData results;
 
   vl53l5cx.setIntegrationTime(5);
-  vl53l5cx.setRangingFrequency(15);
+  vl53l5cx.setRangingFrequency(60);
   vl53l5cx.startRanging();
   waitAndRead(&results); // discard first
   float sigma_short = 0;
@@ -120,7 +120,7 @@ void setup() {
   delay(100);
 
   vl53l5cx.setIntegrationTime(100);
-  vl53l5cx.setRangingFrequency(5);
+  vl53l5cx.setRangingFrequency(5); // slow enough for 100ms integration
   vl53l5cx.startRanging();
   waitAndRead(&results); // discard first
   float sigma_long = 0;
