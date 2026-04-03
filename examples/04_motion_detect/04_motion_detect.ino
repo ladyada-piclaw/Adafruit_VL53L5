@@ -28,22 +28,21 @@ void setup() {
   Serial.println(F("========================================"));
   Serial.println(F("Initializing sensor... (this can take up to 10 seconds)"));
 
-  if (!vl53l5cx.begin()) {
-    Serial.println(F("Failed to initialize VL53L5CX sensor!"));
-    while (1)
-      delay(10);
+  // Initialize with I2C address 0x29, Wire bus, 400kHz clock
+  if (!vl53l5cx.begin(VL53L5CX_DEFAULT_ADDRESS, &Wire, 400000)) {
+    halt(F("Failed to initialize VL53L5CX sensor!"));
   }
 
   Serial.println(F("Sensor initialized!"));
 
   // Use 4x4 resolution (16 zones = 16 motion aggregates)
   if (!vl53l5cx.setResolution(16)) {
-    Serial.println(F("Failed to set resolution!"));
+    halt(F("Failed to set resolution!"));
   }
 
   // Set ranging frequency to 15 Hz
   if (!vl53l5cx.setRangingFrequency(15)) {
-    Serial.println(F("Failed to set ranging frequency!"));
+    halt(F("Failed to set ranging frequency!"));
   }
 
   // Stop ranging before initializing motion indicator
@@ -51,19 +50,17 @@ void setup() {
 
   // Initialize motion indicator with 4x4 resolution (16)
   if (!vl53l5cx.initMotionIndicator(16)) {
-    Serial.println(F("Failed to init motion indicator!"));
+    halt(F("Failed to init motion indicator!"));
   }
 
   // Set motion detection distance range: 400mm to 1500mm
   if (!vl53l5cx.setMotionDistance(400, 1500)) {
-    Serial.println(F("Failed to set motion distance!"));
+    halt(F("Failed to set motion distance!"));
   }
 
   // Start ranging
   if (!vl53l5cx.startRanging()) {
-    Serial.println(F("Failed to start ranging!"));
-    while (1)
-      delay(10);
+    halt(F("Failed to start ranging!"));
   }
 
   Serial.println(F("Starting motion detection...\n"));
@@ -122,4 +119,10 @@ void loop() {
   }
 
   delay(5);
+}
+
+void halt(const __FlashStringHelper* msg) {
+  Serial.println(msg);
+  while (1)
+    delay(10);
 }
