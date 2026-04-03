@@ -23,10 +23,6 @@ void setup() {
   Serial.println(F("Adafruit VL53L5CX simpletest"));
   Serial.println(F("============================"));
 
-  Serial.print(F("I2C address: 0x"));
-  Serial.println(VL53L5CX_DEFAULT_ADDRESS, HEX);
-  Serial.print(F("I2C bus: Wire, clock: 400 kHz"));
-  Serial.println();
   Serial.println(F("Initializing sensor... (this can take up to 10 seconds)"));
 
   if (!vl53l5cx.begin()) {

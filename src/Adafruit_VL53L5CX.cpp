@@ -48,6 +48,12 @@ bool Adafruit_VL53L5CX::begin(uint8_t address, TwoWire* wire,
 
   wire->setClock(i2c_clock);
 
+  Serial.print(F("VL53L5CX: I2C address 0x"));
+  Serial.print(address, HEX);
+  Serial.print(F(", clock "));
+  Serial.print(i2c_clock / 1000);
+  Serial.println(F(" kHz"));
+
   // Set up the platform struct for ST driver
   _config.platform.address = address;
   _config.platform.i2c_dev = _i2c_dev;
