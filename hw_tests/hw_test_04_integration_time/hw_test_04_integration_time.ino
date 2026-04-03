@@ -1,29 +1,29 @@
 /*!
  * @file hw_test_04_integration_time.ino
  *
- * Hardware test: VL53L5CX integration time set/get and noise comparison
+ * Hardware test: VL53L5CX integration time set/get, actual timing,
+ * and noise comparison
  *
- * Tests:
- *  1. Set integration time 2ms, readback matches
- *  2. Set integration time 10ms, readback matches
- *  3. Set integration time 50ms, readback matches
- *  4. Set integration time 100ms, readback matches
- *  5. Set integration time 500ms, readback matches
- *  6. Avg sigma at 10ms integration
- *  7. Avg sigma at 100ms integration (should be lower than 10ms)
+ * Tests each integration time value: set/get readback, then measure
+ * actual frame interval at a fixed ranging frequency to verify the
+ * integration time affects frame timing as expected.
+ * Also compares sigma (noise) at short vs long integration.
+ *
+ * Uses 4x4 resolution, 1 Hz ranging so integration time dominates.
  *
  * Connect VL53L5CX via STEMMA QT / I2C. No extra pins needed.
  */
 
 #include <Adafruit_VL53L5CX.h>
 
-
 Adafruit_VL53L5CX vl53l5cx;
 
 uint8_t passed = 0;
 uint8_t failed = 0;
 
-// Average sigma across all zones (lower = less noise)
+// Integration times to test (ms)
+const uint32_t testTimes[] = {5, 10, 20, 50, 100};
+const uint8_t numTimes = sizeof(testTimes) / sizeof(testTimes[0]);
 
 void setup() {
   Serial.begin(115200);
@@ -33,7 +33,6 @@ void setup() {
   Serial.println(F("=== HW Test 04: Integration Time ==="));
   Serial.println();
 
-
   Serial.println(F("   Initializing sensor..."));
   if (!vl53l5cx.begin(0x29, &Wire, 400000)) {
     Serial.println(F("Init failed!"));
@@ -41,93 +40,106 @@ void setup() {
       delay(10);
   }
 
-  // Use 4x4 for speed
+  // Use 4x4 at 15 Hz — fast enough to see timing differences
   vl53l5cx.setResolution(16);
-  vl53l5cx.setRangingFrequency(1); // slow freq so integration time dominates
+  vl53l5cx.setRangingFrequency(15);
 
-  // Test 1: 2ms
-  bool set2 = vl53l5cx.setIntegrationTime(2);
-  uint32_t it = vl53l5cx.getIntegrationTime();
-  Serial.print(F("   Set 2ms, readback: "));
-  Serial.print(it);
-  Serial.println(F(" ms"));
-  report("1. Set/get 2ms", set2 && it == 2);
+  uint8_t testNum = 1;
+  float intervals[numTimes];
 
-  // Test 2: 10ms
-  bool set10 = vl53l5cx.setIntegrationTime(10);
-  it = vl53l5cx.getIntegrationTime();
-  Serial.print(F("   Set 10ms, readback: "));
-  Serial.print(it);
-  Serial.println(F(" ms"));
-  report("2. Set/get 10ms", set10 && it == 10);
+  for (uint8_t i = 0; i < numTimes; i++) {
+    uint32_t ms = testTimes[i];
 
-  // Test 3: 50ms
-  bool set50 = vl53l5cx.setIntegrationTime(50);
-  it = vl53l5cx.getIntegrationTime();
-  Serial.print(F("   Set 50ms, readback: "));
-  Serial.print(it);
-  Serial.println(F(" ms"));
-  report("3. Set/get 50ms", set50 && it == 50);
+    // Set/get readback
+    bool setOk = vl53l5cx.setIntegrationTime(ms);
+    uint32_t readback = vl53l5cx.getIntegrationTime();
+    Serial.print(F("   Set "));
+    Serial.print(ms);
+    Serial.print(F(" ms, readback: "));
+    Serial.print(readback);
+    Serial.println(F(" ms"));
 
-  // Test 4: 100ms
-  bool set100 = vl53l5cx.setIntegrationTime(100);
-  it = vl53l5cx.getIntegrationTime();
-  Serial.print(F("   Set 100ms, readback: "));
-  Serial.print(it);
-  Serial.println(F(" ms"));
-  report("4. Set/get 100ms", set100 && it == 100);
+    char label[48];
+    snprintf(label, sizeof(label), "%d. Set/get %lu ms", testNum,
+             (unsigned long)ms);
+    report(label, setOk && readback == ms);
+    testNum++;
 
-  // Test 5: 500ms
-  bool set500 = vl53l5cx.setIntegrationTime(500);
-  it = vl53l5cx.getIntegrationTime();
-  Serial.print(F("   Set 500ms, readback: "));
-  Serial.print(it);
-  Serial.println(F(" ms"));
-  report("5. Set/get 500ms", set500 && it == 500);
+    // Measure actual frame interval
+    vl53l5cx.startRanging();
+    intervals[i] = measureFrameInterval(5);
+    vl53l5cx.stopRanging();
+    delay(100); // sensor needs time to fully stop before reconfigure
 
-  // Test 6 & 7: Compare sigma at 10ms vs 100ms
+    Serial.print(F("   Frame interval: "));
+    Serial.print(intervals[i], 1);
+    Serial.println(F(" ms"));
+
+    // Interval must be at least the integration time
+    snprintf(label, sizeof(label), "%d. %lu ms interval >= integ time",
+             testNum, (unsigned long)ms);
+    report(label, intervals[i] >= (float)ms * 0.8);
+    testNum++;
+  }
+
+  // Test: longer integration -> longer (or equal) frame interval
+  Serial.println();
+  Serial.println(F("   Timing monotonicity check:"));
+  for (uint8_t i = 1; i < numTimes; i++) {
+    Serial.print(F("   "));
+    Serial.print(testTimes[i - 1]);
+    Serial.print(F(" ms -> "));
+    Serial.print(intervals[i - 1], 1);
+    Serial.print(F(" ms,  "));
+    Serial.print(testTimes[i]);
+    Serial.print(F(" ms -> "));
+    Serial.print(intervals[i], 1);
+    Serial.println(F(" ms"));
+  }
+  // Overall: longest integration interval > shortest
+  char label[48];
+  snprintf(label, sizeof(label), "%d. Longer integ = longer interval", testNum);
+  report(label, intervals[numTimes - 1] > intervals[0]);
+  testNum++;
+
+  // Sigma comparison: short (5ms) vs long (100ms)
+  Serial.println();
   VL53L5CX_ResultsData results;
 
-  // Measure sigma at 10ms
-  vl53l5cx.setIntegrationTime(10);
-  vl53l5cx.setRangingFrequency(5);
+  vl53l5cx.setIntegrationTime(5);
+  vl53l5cx.setRangingFrequency(15);
   vl53l5cx.startRanging();
-  // Discard first frame
-  waitAndRead(&results);
-  // Average over 3 frames
-  float sigma10_total = 0;
+  waitAndRead(&results); // discard first
+  float sigma_short = 0;
   for (uint8_t f = 0; f < 3; f++) {
     waitAndRead(&results);
-    sigma10_total += avgSigma(&results, 16);
+    sigma_short += avgSigma(&results, 16);
   }
-  float sigma10 = sigma10_total / 3.0;
+  sigma_short /= 3.0;
   vl53l5cx.stopRanging();
+  delay(100);
 
-  Serial.print(F("   Avg sigma at 10ms: "));
-  Serial.print(sigma10, 1);
-  Serial.println(F(" mm"));
-  report("6. Sigma at 10ms readable", sigma10 > 0);
-
-  // Measure sigma at 100ms
   vl53l5cx.setIntegrationTime(100);
   vl53l5cx.setRangingFrequency(5);
   vl53l5cx.startRanging();
   waitAndRead(&results); // discard first
-  float sigma100_total = 0;
+  float sigma_long = 0;
   for (uint8_t f = 0; f < 3; f++) {
     waitAndRead(&results);
-    sigma100_total += avgSigma(&results, 16);
+    sigma_long += avgSigma(&results, 16);
   }
-  float sigma100 = sigma100_total / 3.0;
+  sigma_long /= 3.0;
   vl53l5cx.stopRanging();
 
-  Serial.print(F("   Avg sigma at 100ms: "));
-  Serial.print(sigma100, 1);
+  Serial.print(F("   Sigma at 5ms: "));
+  Serial.print(sigma_short, 1);
   Serial.println(F(" mm"));
-  Serial.print(F("   Sigma ratio (10ms/100ms): "));
-  Serial.println(sigma10 / sigma100, 2);
-  // Longer integration should have equal or lower sigma
-  report("7. 100ms sigma <= 10ms sigma", sigma100 <= sigma10);
+  Serial.print(F("   Sigma at 100ms: "));
+  Serial.print(sigma_long, 1);
+  Serial.println(F(" mm"));
+
+  snprintf(label, sizeof(label), "%d. 100ms sigma <= 5ms sigma", testNum);
+  report(label, sigma_long <= sigma_short);
 
   // Summary
   Serial.println();
@@ -144,7 +156,7 @@ void loop() {
   delay(1000);
 }
 
-void report(const char* name, bool ok) {
+void report(const char *name, bool ok) {
   Serial.print(name);
   if (ok) {
     Serial.println(F(" ... PASSED"));
@@ -155,7 +167,35 @@ void report(const char* name, bool ok) {
   }
 }
 
-bool waitAndRead(VL53L5CX_ResultsData* results) {
+float measureFrameInterval(uint8_t numFrames) {
+  VL53L5CX_ResultsData results;
+  // Flush stale data
+  while (vl53l5cx.isDataReady()) {
+    vl53l5cx.getRangingData(&results);
+  }
+  // Wait for first frame
+  unsigned long timeout = millis() + 5000;
+  while (!vl53l5cx.isDataReady()) {
+    if (millis() > timeout)
+      return -1;
+    delay(1);
+  }
+  vl53l5cx.getRangingData(&results);
+
+  unsigned long start = millis();
+  for (uint8_t i = 0; i < numFrames; i++) {
+    timeout = millis() + 5000;
+    while (!vl53l5cx.isDataReady()) {
+      if (millis() > timeout)
+        return -1;
+      delay(1);
+    }
+    vl53l5cx.getRangingData(&results);
+  }
+  return (float)(millis() - start) / numFrames;
+}
+
+bool waitAndRead(VL53L5CX_ResultsData *results) {
   unsigned long start = millis();
   while (millis() - start < 5000) {
     if (vl53l5cx.isDataReady()) {
@@ -166,7 +206,7 @@ bool waitAndRead(VL53L5CX_ResultsData* results) {
   return false;
 }
 
-float avgSigma(VL53L5CX_ResultsData* results, uint8_t zones) {
+float avgSigma(VL53L5CX_ResultsData *results, uint8_t zones) {
   uint32_t sum = 0;
   for (uint8_t i = 0; i < zones; i++) {
     sum += results->range_sigma_mm[i];

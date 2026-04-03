@@ -67,6 +67,7 @@ void setup() {
     vl53l5cx.startRanging();
     float interval = measureFrameInterval(frames);
     vl53l5cx.stopRanging();
+    delay(100); // sensor needs time to fully stop before reconfigure
 
     Serial.print(F("   Measured interval: "));
     Serial.print(interval, 1);
