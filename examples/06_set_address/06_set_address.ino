@@ -12,7 +12,6 @@
  */
 
 #include <Adafruit_VL53L5CX.h>
-#include <Wire.h>
 
 Adafruit_VL53L5CX vl53l5cx;
 
@@ -24,31 +23,29 @@ void setup() {
   while (!Serial)
     delay(10);
 
-  Serial.println("Adafruit VL53L5CX - Set Address Example");
-  Serial.println("========================================");
+  Serial.println(F("Adafruit VL53L5CX - Set Address Example"));
+  Serial.println(F("========================================"));
   Serial.println();
 
-  Serial.print("Initializing sensor at default address 0x");
+  Serial.print(F("Initializing sensor at default address 0x"));
   Serial.print(DEFAULT_ADDRESS, HEX);
-  Serial.println("...");
-  Serial.println("(this can take up to 10 seconds)");
+  Serial.println(F("..."));
+  Serial.println(F("(this can take up to 10 seconds)"));
 
-  if (!vl53l5cx.begin(DEFAULT_ADDRESS)) {
-    Serial.println("Failed to initialize VL53L5CX sensor!");
-    Serial.println("Check wiring and try again.");
-    while (1)
-      delay(10);
+  // Initialize with default address, Wire bus, 400kHz clock
+  if (!vl53l5cx.begin(DEFAULT_ADDRESS, &Wire, 400000)) {
+    halt(F("Failed to initialize VL53L5CX sensor!"));
   }
 
-  Serial.println("Sensor initialized!");
+  Serial.println(F("Sensor initialized!"));
   Serial.println();
 
   // Show current address
-  Serial.print("Current I2C address: 0x");
+  Serial.print(F("Current I2C address: 0x"));
   Serial.println(DEFAULT_ADDRESS, HEX);
   Serial.println();
 
-  Serial.println("Send any character to change address to 0x30...");
+  Serial.println(F("Send any character to change address to 0x30..."));
 
   // Wait for user input
   while (!Serial.available()) {
@@ -60,45 +57,41 @@ void setup() {
   }
 
   // Change the address
-  Serial.print("Changing address to 0x");
+  Serial.print(F("Changing address to 0x"));
   Serial.print(NEW_ADDRESS, HEX);
-  Serial.println("...");
+  Serial.println(F("..."));
 
   if (!vl53l5cx.setAddress(NEW_ADDRESS)) {
-    Serial.println("Failed to change address!");
-    while (1)
-      delay(10);
+    halt(F("Failed to change address!"));
   }
 
-  Serial.println("Address changed successfully!");
+  Serial.println(F("Address changed successfully!"));
   Serial.println();
 
   // Verify by starting ranging at the new address
-  Serial.println("Verifying sensor responds at new address...");
+  Serial.println(F("Verifying sensor responds at new address..."));
 
   if (!vl53l5cx.startRanging()) {
-    Serial.println("Failed to start ranging at new address!");
-    while (1)
-      delay(10);
+    halt(F("Failed to start ranging at new address!"));
   }
 
-  Serial.println("SUCCESS! Sensor is responding at new address.");
+  Serial.println(F("SUCCESS! Sensor is responding at new address."));
   Serial.println();
 
   // Scan I2C bus to show the change
-  Serial.println("I2C scan showing device at new address:");
+  Serial.println(F("I2C scan showing device at new address:"));
   scanI2C();
 
   Serial.println();
-  Serial.println("NOTE: The address change is stored in RAM only.");
-  Serial.println("The sensor will return to default address (0x29)");
-  Serial.println("after a power cycle.");
+  Serial.println(F("NOTE: The address change is stored in RAM only."));
+  Serial.println(F("The sensor will return to default address (0x29)"));
+  Serial.println(F("after a power cycle."));
   Serial.println();
-  Serial.println("To use multiple sensors:");
-  Serial.println("1. Connect LPn pins of all sensors to GPIO pins");
-  Serial.println("2. Hold all LPn LOW to disable all sensors");
-  Serial.println("3. Set one LPn HIGH, change that sensor's address");
-  Serial.println("4. Repeat for each sensor with unique addresses");
+  Serial.println(F("To use multiple sensors:"));
+  Serial.println(F("1. Connect LPn pins of all sensors to GPIO pins"));
+  Serial.println(F("2. Hold all LPn LOW to disable all sensors"));
+  Serial.println(F("3. Set one LPn HIGH, change that sensor's address"));
+  Serial.println(F("4. Repeat for each sensor with unique addresses"));
 }
 
 void loop() {
@@ -110,10 +103,16 @@ void scanI2C() {
   for (uint8_t addr = 1; addr < 127; addr++) {
     Wire.beginTransmission(addr);
     if (Wire.endTransmission() == 0) {
-      Serial.print("  Found device at 0x");
+      Serial.print(F("  Found device at 0x"));
       if (addr < 16)
-        Serial.print("0");
+        Serial.print(F("0"));
       Serial.println(addr, HEX);
     }
   }
+}
+
+void halt(const __FlashStringHelper* msg) {
+  Serial.println(msg);
+  while (1)
+    delay(10);
 }

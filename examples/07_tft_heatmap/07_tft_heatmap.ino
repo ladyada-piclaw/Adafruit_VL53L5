@@ -198,26 +198,23 @@ void setup() {
   tft.setRotation(3);
   tft.fillScreen(ST77XX_BLACK);
 
-  if (!vl53l5cx.begin()) {
-    Serial.println(F("Failed to initialize VL53L5CX sensor!"));
-    while (1)
-      delay(10);
+  // Initialize with I2C address 0x29, Wire bus, 400kHz clock
+  if (!vl53l5cx.begin(VL53L5CX_DEFAULT_ADDRESS, &Wire, 400000)) {
+    halt(F("Failed to initialize VL53L5CX sensor!"));
   }
 
   Serial.println(F("Sensor initialized!"));
 
   if (!vl53l5cx.setResolution(64)) {
-    Serial.println(F("Failed to set resolution!"));
+    halt(F("Failed to set resolution!"));
   }
 
   if (!vl53l5cx.setRangingFrequency(15)) {
-    Serial.println(F("Failed to set ranging frequency!"));
+    halt(F("Failed to set ranging frequency!"));
   }
 
   if (!vl53l5cx.startRanging()) {
-    Serial.println(F("Failed to start ranging!"));
-    while (1)
-      delay(10);
+    halt(F("Failed to start ranging!"));
   }
 
   Serial.print(F("Resolution: "));
@@ -364,4 +361,10 @@ void loop() {
   }
 
   delay(5);
+}
+
+void halt(const __FlashStringHelper* msg) {
+  Serial.println(msg);
+  while (1)
+    delay(10);
 }
