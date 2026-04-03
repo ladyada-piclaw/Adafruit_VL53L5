@@ -1,0 +1,19 @@
+=== HW Test 06: Target Order ===
+
+   Initializing sensor...
+   Default order: 2
+1. Default target order readable ... PASSED
+   Set CLOSEST, readback: 1
+2. Set/get CLOSEST (1) ... PASSED
+   Set STRONGEST, readback: 2
+3. Set/get STRONGEST (2) ... PASSED
+   Back to CLOSEST, readback: 1
+4. Switch back to CLOSEST ... PASSED
+   CLOSEST valid zones: 16/16
+5. Range with CLOSEST order ... PASSED
+   STRONGEST valid zones: 16/16
+6. Range with STRONGEST order ... PASSED
+
+=== SUMMARY ===
+6 passed, 0 failed
+Result: ALL PASSED

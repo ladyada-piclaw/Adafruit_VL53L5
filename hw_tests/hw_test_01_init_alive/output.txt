@@ -1,0 +1,24 @@
+=== HW Test 01: Init & Alive ===
+
+1. I2C device at 0x29 ... PASSED
+   Initializing sensor (up to 10s)...
+2. begin() succeeds ... PASSED
+   Resolution: 16
+3. Default resolution readback ... PASSED
+   Ranging frequency: 1 Hz
+4. Default ranging freq readback ... PASSED
+   Integration time: 10 ms
+5. Default integration time readback ... PASSED
+   Sharpener: 14%
+6. Default sharpener readback ... PASSED
+7. startRanging() succeeds ... PASSED
+   Data ready after 29 ms
+8. Data ready within 5s ... PASSED
+9. getRangingData() succeeds ... PASSED
+   Non-zero distances: 16/16
+   Valid range (1-4000mm): 16/16
+10. Distance values sane ... PASSED
+
+=== SUMMARY ===
+10 passed, 0 failed
+Result: ALL PASSED

@@ -1,0 +1,18 @@
+=== HW Test 08: Power Mode ===
+
+   Initializing sensor...
+   Default power mode: 1
+1. Default is WAKEUP (1) ... PASSED
+   Set SLEEP, readback: 0
+2. Set/get SLEEP (0) ... PASSED
+   Set WAKEUP, readback: 1
+3. Set/get WAKEUP (1) ... PASSED
+   Post-wake valid zones: 16/16
+4. Range after wakeup works ... PASSED
+   Sleep/wake cycle...
+   Cycle valid zones: 16/16
+5. Sleep/wake cycle + range ... PASSED
+
+=== SUMMARY ===
+5 passed, 0 failed
+Result: ALL PASSED

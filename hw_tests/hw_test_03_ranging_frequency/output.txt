@@ -1,0 +1,21 @@
+=== HW Test 03: Ranging Frequency ===
+
+   Initializing sensor...
+   Set 1 Hz, readback: 1 Hz
+1. Set/get 1 Hz ... PASSED
+   Set 5 Hz, readback: 5 Hz
+2. Set/get 5 Hz ... PASSED
+   Set 15 Hz, readback: 15 Hz
+3. Set/get 15 Hz ... PASSED
+   Set 30 Hz, readback: 30 Hz
+4. Set/get 30 Hz ... PASSED
+   Set 60 Hz, readback: 60 Hz
+5. Set/get 60 Hz ... PASSED
+   15 Hz avg interval: 69.2 ms (expect ~67ms)
+6. 15 Hz timing (~67ms) ... PASSED
+   5 Hz avg interval: 188.6 ms (expect ~200ms)
+7. 5 Hz timing (~200ms) ... PASSED
+
+=== SUMMARY ===
+7 passed, 0 failed
+Result: ALL PASSED

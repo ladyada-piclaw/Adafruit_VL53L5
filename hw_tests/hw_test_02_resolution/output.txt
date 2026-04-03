@@ -1,0 +1,19 @@
+=== HW Test 02: Resolution ===
+
+   Initializing sensor...
+   Set 4x4, readback: 16
+1. Set 4x4 resolution ... PASSED
+   4x4 valid zones: 16/16
+2. Range in 4x4 mode ... PASSED
+   Set 8x8, readback: 64
+3. Set 8x8 resolution ... PASSED
+   8x8 valid zones: 64/64
+4. Range in 8x8 mode ... PASSED
+   Back to 4x4, readback: 16
+5. Switch back to 4x4 ... PASSED
+   After invalid set, readback: 16
+6. Invalid resolution (32) rejected ... PASSED
+
+=== SUMMARY ===
+6 passed, 0 failed
+Result: ALL PASSED

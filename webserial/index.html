@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VL53L5CX 8x8 ToF Distance Grid</title>
+  <!-- oEmbed Discovery Links -->
+  <link rel="alternate" type="application/json+oembed" href="https://adafruit.github.io/Adafruit_VL53L5/webserial/oembed.json" title="Adafruit VL53L5CX Demo" />
+  <style>
+    :root {
+      --adafruit-purple: #6f42c1;
+      --adafruit-purple-hover: #5a32a3;
+      --bg-dark: #1a1a2e;
+      --bg-card: #16213e;
+      --text-primary: #e8e8e8;
+      --text-secondary: #a0a0a0;
+      --border-color: #2d3a5a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95em;
+    }
+
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: var(--adafruit-purple);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: var(--adafruit-purple-hover);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background-color: #4a4a6a;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    button.disconnect {
+      background-color: #dc3545;
+    }
+
+    button.disconnect:hover:not(:disabled) {
+      background-color: #c82333;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-group label {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    select:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #dc3545;
+    }
+
+    .status-dot.connected {
+      background-color: #28a745;
+    }
+
+    .status-value {
+      font-weight: 600;
+      color: var(--adafruit-purple);
+    }
+
+    .grid-container {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .grid-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    #distance-grid {
+      display: grid;
+      gap: 4px;
+      max-width: 100%;
+    }
+
+    .grid-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      transition: background-color 0.15s;
+      min-width: 40px;
+      min-height: 40px;
+    }
+
+    .color-scale {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .scale-bar {
+      width: 200px;
+      height: 16px;
+      border-radius: 4px;
+      background: linear-gradient(to right, 
+        hsl(0, 80%, 50%),
+        hsl(30, 80%, 50%),
+        hsl(60, 80%, 50%),
+        hsl(120, 60%, 45%),
+        hsl(180, 60%, 45%),
+        hsl(220, 70%, 50%),
+        hsl(260, 70%, 50%)
+      );
+    }
+
+    .scale-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .serial-log-container {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .log-header:hover {
+      background: rgba(0,0,0,0.3);
+    }
+
+    .log-header h3 {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .log-toggle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    #serial-log {
+      max-height: 0;
+      overflow-y: auto;
+      background-color: #0d1117;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+      transition: max-height 0.3s ease;
+      padding: 0 16px;
+    }
+
+    #serial-log.expanded {
+      max-height: 200px;
+      padding: 12px 16px;
+    }
+
+    .log-entry {
+      padding: 2px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .log-entry.status {
+      color: #58a6ff;
+    }
+
+    .log-entry.error {
+      color: #f85149;
+    }
+
+    .log-entry.command {
+      color: #a371f7;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.4em; }
+      .grid-cell { 
+        min-width: 32px; 
+        min-height: 32px;
+        font-size: 9px;
+      }
+      .controls-bar { padding: 12px; gap: 8px; }
+      button { padding: 8px 14px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>VL53L5CX 8x8 ToF Distance Grid</h1>
+      <p class="subtitle">Connect your microcontroller with VL53L5CX sensor to visualize distance measurements</p>
+    </header>
+
+    <div class="controls-bar">
+      <button id="connect-btn">Connect</button>
+      <button id="disconnect-btn" class="disconnect" disabled>Disconnect</button>
+      
+      <div class="control-group">
+        <label for="rate-select">Rate:</label>
+        <select id="rate-select" disabled>
+          <option value="1">1 Hz</option>
+          <option value="2">2 Hz</option>
+          <option value="5">5 Hz</option>
+          <option value="10">10 Hz</option>
+          <option value="15" selected>15 Hz</option>
+          <option value="30">30 Hz</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="res-select">Resolution:</label>
+        <select id="res-select" disabled>
+          <option value="16">4×4</option>
+          <option value="64" selected>8×8</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="interp-select">Interpolation:</label>
+        <select id="interp-select">
+          <option value="none" selected>None</option>
+          <option value="16">16×16</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Disconnected</span>
+      </div>
+      <div class="status-item">
+        Resolution: <span class="status-value" id="current-res">--</span>
+      </div>
+      <div class="status-item">
+        Rate: <span class="status-value" id="current-rate">--</span>
+      </div>
+    </div>
+
+    <div class="grid-container">
+      <div class="grid-wrapper">
+        <div id="distance-grid"></div>
+      </div>
+      <div class="color-scale">
+        <span class="scale-label">0mm</span>
+        <div class="scale-bar"></div>
+        <span class="scale-label">2000mm+</span>
+      </div>
+    </div>
+
+    <div class="serial-log-container">
+      <div class="log-header" id="log-toggle">
+        <h3>Serial Log</h3>
+        <span class="log-toggle">▼ Click to expand</span>
+      </div>
+      <div id="serial-log"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

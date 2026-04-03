@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "title": "Adafruit VL53L5CX Library",
+  "provider_name": "Adafruit",
+  "provider_url": "https://www.adafruit.com",
+  "author_name": "Adafruit",
+  "author_url": "https://github.com/adafruit",
+  "width": 900,
+  "height": 700,
+  "html": "<iframe src='https://adafruit.github.io/Adafruit_VL53L5/webserial/' width='900' height='700' style='border: 1px solid #ddd; border-radius: 4px; max-width: 100%;' allow='serial; usb' loading='lazy' title='Adafruit VL53L5CX Arduino Library'></iframe>"
+}
