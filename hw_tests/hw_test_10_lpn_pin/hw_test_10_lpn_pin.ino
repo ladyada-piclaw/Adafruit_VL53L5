@@ -41,8 +41,8 @@ void setup() {
 
   // Let LPn float (breakout has pullup) to start
   pinMode(LPN_PIN, INPUT);
+  Wire.begin();
   delay(100);
-
 
   // Test 1: Sensor on I2C with LPn HIGH
   bool found = i2cPresent(0x29);
