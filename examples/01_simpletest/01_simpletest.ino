@@ -23,6 +23,8 @@ void setup() {
   Serial.println(F("Adafruit VL53L5CX simpletest"));
   Serial.println(F("============================"));
 
+  // Initialize with I2C address 0x29, Wire bus, 400kHz clock
+  // You can also try 1000000 (1MHz) for faster firmware upload
   Serial.println(F("Initializing sensor... (this can take up to 10 seconds)"));
 
   if (!vl53l5cx.begin(VL53L5CX_DEFAULT_ADDRESS, &Wire, 400000)) {
