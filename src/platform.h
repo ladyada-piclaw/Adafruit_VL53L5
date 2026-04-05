@@ -37,7 +37,7 @@
 
 typedef struct {
   uint16_t address;
-  Adafruit_I2CDevice *i2c_dev;
+  Adafruit_I2CDevice* i2c_dev;
 } VL53L5CX_Platform;
 
 /*
@@ -78,8 +78,8 @@ typedef struct {
 #define SWAP_UINT32(x) (x)
 #else
 #define SWAP_UINT16(x) (((x) >> 8) | ((x) << 8))
-#define SWAP_UINT32(x)                                                         \
-  (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) |       \
+#define SWAP_UINT32(x)                                                   \
+  (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | \
    ((x) << 24))
 #endif
 
@@ -91,8 +91,8 @@ typedef struct {
  * @return (uint8_t) status : 0 if OK
  */
 
-uint8_t RdByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
-               uint8_t *p_value);
+uint8_t RdByte(VL53L5CX_Platform* p_platform, uint16_t RegisterAdress,
+               uint8_t* p_value);
 
 /**
  * @brief Mandatory function used to write one single byte.
@@ -103,7 +103,7 @@ uint8_t RdByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
  * @return (uint8_t) status : 0 if OK
  */
 
-uint8_t WrByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
+uint8_t WrByte(VL53L5CX_Platform* p_platform, uint16_t RegisterAdress,
                uint8_t value);
 
 /**
@@ -116,8 +116,8 @@ uint8_t WrByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
  * @return (uint8_t) status : 0 if OK
  */
 
-uint8_t RdMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
-                uint8_t *p_values, uint32_t size);
+uint8_t RdMulti(VL53L5CX_Platform* p_platform, uint16_t RegisterAdress,
+                uint8_t* p_values, uint32_t size);
 
 /**
  * @brief Mandatory function used to write multiples bytes.
@@ -129,8 +129,8 @@ uint8_t RdMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
  * @return (uint8_t) status : 0 if OK
  */
 
-uint8_t WrMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
-                uint8_t *p_values, uint32_t size);
+uint8_t WrMulti(VL53L5CX_Platform* p_platform, uint16_t RegisterAdress,
+                uint8_t* p_values, uint32_t size);
 
 /**
  * @brief Mandatory function, used to swap a buffer. The buffer size is always a
@@ -139,7 +139,7 @@ uint8_t WrMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAdress,
  * @param (uint16_t) size : Buffer size to swap
  */
 
-void SwapBuffer(uint8_t *buffer, uint16_t size);
+void SwapBuffer(uint8_t* buffer, uint16_t size);
 
 /**
  * @brief Mandatory function, used to wait during an amount of time. It must be
@@ -150,6 +150,6 @@ void SwapBuffer(uint8_t *buffer, uint16_t size);
  * @return (uint8_t) status : 0 if wait is finished.
  */
 
-uint8_t WaitMs(VL53L5CX_Platform *p_platform, uint32_t TimeMs);
+uint8_t WaitMs(VL53L5CX_Platform* p_platform, uint32_t TimeMs);
 
 #endif // _PLATFORM_H_
