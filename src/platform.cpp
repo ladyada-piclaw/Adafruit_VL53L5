@@ -11,10 +11,11 @@
  *******************************************************************************/
 
 #include "platform.h"
+
 #include <Arduino.h>
 
-uint8_t RdByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
-               uint8_t *p_value) {
+uint8_t RdByte(VL53L5CX_Platform* p_platform, uint16_t RegisterAddress,
+               uint8_t* p_value) {
   uint8_t reg[2];
   reg[0] = (RegisterAddress >> 8) & 0xFF;
   reg[1] = RegisterAddress & 0xFF;
@@ -25,7 +26,7 @@ uint8_t RdByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
   return 0;
 }
 
-uint8_t WrByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
+uint8_t WrByte(VL53L5CX_Platform* p_platform, uint16_t RegisterAddress,
                uint8_t value) {
   uint8_t buffer[3];
   buffer[0] = (RegisterAddress >> 8) & 0xFF;
@@ -38,8 +39,8 @@ uint8_t WrByte(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
   return 0;
 }
 
-uint8_t RdMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
-                uint8_t *p_values, uint32_t size) {
+uint8_t RdMulti(VL53L5CX_Platform* p_platform, uint16_t RegisterAddress,
+                uint8_t* p_values, uint32_t size) {
   uint8_t reg[2];
   uint32_t bytesRemaining = size;
   uint32_t offset = 0;
@@ -66,8 +67,8 @@ uint8_t RdMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
   return 0;
 }
 
-uint8_t WrMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
-                uint8_t *p_values, uint32_t size) {
+uint8_t WrMulti(VL53L5CX_Platform* p_platform, uint16_t RegisterAddress,
+                uint8_t* p_values, uint32_t size) {
   uint32_t bytesRemaining = size;
   uint32_t offset = 0;
   // Reserve 2 bytes for register address
@@ -94,7 +95,7 @@ uint8_t WrMulti(VL53L5CX_Platform *p_platform, uint16_t RegisterAddress,
   return 0;
 }
 
-void SwapBuffer(uint8_t *buffer, uint16_t size) {
+void SwapBuffer(uint8_t* buffer, uint16_t size) {
   uint32_t i, tmp;
 
   for (i = 0; i < size; i = i + 4) {
@@ -104,7 +105,7 @@ void SwapBuffer(uint8_t *buffer, uint16_t size) {
   }
 }
 
-uint8_t WaitMs(VL53L5CX_Platform *p_platform, uint32_t TimeMs) {
+uint8_t WaitMs(VL53L5CX_Platform* p_platform, uint32_t TimeMs) {
   (void)p_platform; // Unused
   delay(TimeMs);
   return 0;
