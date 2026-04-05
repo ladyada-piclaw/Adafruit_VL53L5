@@ -19,11 +19,11 @@ jobs:
     - name: pre-install
       run: bash ci/actions_install.sh
 
-    - name: test platforms
-      run: python3 ci/build_platform.py esp32 feather_m4_express pico_rp2040 feather_rp2350 feather_esp32s3
-
     - name: clang
       run: python3 ci/run-clang-format.py -e "ci/*" -e "bin/*" -e "src/vl53l5cx_*" -r .
+
+    - name: test platforms
+      run: python3 ci/build_platform.py esp32 feather_m4_express pico_rp2040 feather_rp2350 feather_esp32s3
 
     - name: doxygen
       env:
